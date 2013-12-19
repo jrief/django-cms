@@ -64,6 +64,7 @@ else: # pragma: no cover
     create_revision = lambda: lambda x: x
 
 PUBLISH_COMMENT = "Publish"
+INITIAL_COMMENT = "Initial version."
 
 
 def contribute_fieldsets(cls):
@@ -497,7 +498,7 @@ class PageAdmin(ModelAdmin):
         extra_context.update(self.get_unihandecode_context(language))
         return super(PageAdmin, self).add_view(request, form_url, extra_context=extra_context)
 
-    def change_view(self, request, object_id, extra_context=None):
+    def change_view(self, request, object_id, form_url='', extra_context=None):
         """
         The 'change' admin view for the Page model.
         """
@@ -538,7 +539,8 @@ class PageAdmin(ModelAdmin):
         # as a parameter, the workaround is to set it as an attribute...
         if DJANGO_1_4:
             self._current_page = obj
-        response = super(PageAdmin, self).change_view(request, object_id, extra_context=extra_context)
+        response = super(PageAdmin, self).change_view(
+            request, object_id, form_url=form_url, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
@@ -872,9 +874,10 @@ class PageAdmin(ModelAdmin):
             from reversion.models import Version
 
             content_type = ContentType.objects.get_for_model(Page)
-            versions_qs = Version.objects.filter(type=1, content_type=content_type, object_id_int=page.pk)
+            # reversion 1.8+ removes type field, revision filtering must be based on comments
+            versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
             deleted = []
-            for version in versions_qs.exclude(revision__comment__exact=PUBLISH_COMMENT):
+            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)):
                 if not version.revision_id in deleted:
                     revision = version.revision
                     revision.delete()
@@ -984,7 +987,7 @@ class PageAdmin(ModelAdmin):
                 raise PermissionDenied
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': get_language_object(language)['name']
+                'language': force_unicode(get_language_object(language)['name'])
             }
             self.log_change(request, titleobj, message)
             messages.info(request, message)

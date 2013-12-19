@@ -20,6 +20,7 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
 import django
 from django.contrib import admin
+from django.db.models import Max
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
 from django.contrib.auth.models import User, Permission, AnonymousUser
@@ -271,10 +272,15 @@ class AdminTestCase(AdminTestsBase):
         page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin, published=True)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
+        create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin):
             response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_change_template(self):
@@ -795,6 +801,26 @@ class AdminTests(AdminTestsBase):
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+
+    def test_thousands_format_in_admin(self):
+        page = self.get_page()
+        for placeholder in page.placeholders.all():
+            page.placeholders.remove(placeholder)
+            placeholder.pk += 1000
+            placeholder.save()
+            page.placeholders.add(placeholder)
+        page.reload()
+        for placeholder in page.placeholders.all():
+            plugin = add_plugin(placeholder, "TextPlugin", "en", body="body",
+                                id=placeholder.pk)
+        admin = self.get_admin()
+        url = reverse('admin:cms_page_change', args=(page.pk,))
+        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+            with self.login_user_context(admin):
+                response = self.client.get(url)
+                for placeholder in page.placeholders.all():
+                    self.assertContains(response, "placeholder_element.data('id', %s);" % placeholder.pk)
+                    self.assertContains(response, 'id="plugin_%s' % placeholder.pk)
 
 
 class NoDBAdminTests(CMSTestCase):

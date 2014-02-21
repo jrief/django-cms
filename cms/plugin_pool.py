@@ -199,11 +199,8 @@ class PluginPool(object):
             if include_plugin:
                 final_plugins.append(plugin)
 
-        if final_plugins:
-            plugins = final_plugins
-
         # plugins sorted by modules
-        plugins = sorted(plugins, key=lambda obj: force_unicode(obj.module))
+        plugins = sorted(final_plugins, key=lambda obj: force_unicode(obj.module))
         return plugins
 
     def get_text_enabled_plugins(self, placeholder, page):

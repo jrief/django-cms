@@ -2,7 +2,6 @@
 from cms.utils.compat.type_checks import string_types
 from django.db.models import signals
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from django.template.loader import find_template
 import warnings
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase

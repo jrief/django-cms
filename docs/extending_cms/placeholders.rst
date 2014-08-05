@@ -36,8 +36,10 @@ use::
         # your methods
 
 
-The :class:`~cms.models.fields.PlaceholderField` has one required parameter (`slotname`) which can be a of type string, allowing you to configure which plugins can be used in this
-placeholder (configuration is the same as for placeholders in the CMS) or you can also provide a callable like so::
+The :class:`~cms.models.fields.PlaceholderField` has one required parameter (`slotname`) which can
+be a of type string, allowing you to configure which plugins can be used in this placeholder
+(configuration is the same as for placeholders in the CMS) or you can also provide a callable like
+so::
 
     from django.db import models
     from cms.models.fields import PlaceholderField

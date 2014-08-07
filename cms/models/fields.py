@@ -8,13 +8,13 @@ from django.db import models
 
 class PlaceholderField(models.ForeignKey):
 
-    def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
+    def __init__(self, slotname, glossary={}, actions=PlaceholderNoAction, **kwargs):
         if kwargs.get('related_name', None) == '+':
             raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
         if not callable(slotname):
             validate_placeholder_name(slotname)
         self.slotname = slotname
-        self.default_width = default_width
+        self.glossary = glossary
         self.actions = actions()
         if 'to' in kwargs:
             del(kwargs['to'])
@@ -28,7 +28,7 @@ class PlaceholderField(models.ForeignKey):
         return name, path, args, kwargs
 
     def _get_new_placeholder(self, instance):
-        return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), default_width=self.default_width)
+        return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), glossary=self.glossary)
 
     def _get_placeholder_slot(self, model_instance):
         if callable(self.slotname):

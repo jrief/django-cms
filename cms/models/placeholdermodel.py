@@ -7,6 +7,7 @@ from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib import admin
+from jsonfield.fields import JSONField
 
 from cms.exceptions import LanguageError
 from cms.utils import get_cms_setting
@@ -19,7 +20,7 @@ from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 @python_2_unicode_compatible
 class Placeholder(models.Model):
     slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
-    default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
+    glossary = JSONField(null=True, blank=True, default={}, editable=False)
     cache_placeholder = True
 
     class Meta:
@@ -134,9 +135,8 @@ class Placeholder(models.Model):
 
     def render(self, context, width, lang=None):
         from cms.plugin_rendering import render_placeholder
-        if not 'request' in context:
+        if 'request' not in context:
             return '<!-- missing request -->'
-        width = width or self.default_width
         if width:
             context.update({'width': width})
         return render_placeholder(self, context, lang=lang)

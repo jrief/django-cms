@@ -205,11 +205,11 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     fieldsets = (
         (None, {
-            'fields': ('overwrite_url','redirect'),
+            'fields': ('overwrite_url', 'redirect'),
         }),
         ('Language independent options', {
-            'fields': ('site', 'template', 'reverse_id', 'soft_root', 'navigation_extenders',
-            'application_urls', 'application_namespace', "xframe_options",)
+            'fields': ('site', 'template', 'reverse_id', 'soft_root', 'menu_node',
+            'navigation_extenders', 'application_urls', 'application_namespace', 'xframe_options',)
         })
     )
 

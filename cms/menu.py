@@ -18,6 +18,7 @@ from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset, use_draft
 from cms.utils.plugins import current_site
+from cms import api
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
@@ -163,9 +164,12 @@ def page_to_node(page, home, cut):
     """
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
-    attr = {'soft_root': page.soft_root,
+    attr = {
+        'soft_root': page.soft_root,
+        'menu_node': page.menu_node,
         'auth_required': page.login_required,
-        'reverse_id': page.reverse_id, }
+        'reverse_id': page.reverse_id,
+    }
 
     parent_id = page.parent_id
     # Should we cut the Node from its parents?
@@ -176,12 +180,12 @@ def page_to_node(page, home, cut):
     #if parent_id and not page.parent.get_calculated_status():
     #    parent_id = None # ????
 
-    if page.limit_visibility_in_menu == None:
+    if page.limit_visibility_in_menu == api.VISIBILITY_ALL:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
-        attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
-        attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
+        attr['visible_for_authenticated'] = page.limit_visibility_in_menu == api.VISIBILITY_USERS
+        attr['visible_for_anonymous'] = page.limit_visibility_in_menu == api.VISIBILITY_STAFF
     attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []

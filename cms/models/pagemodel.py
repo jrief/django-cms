@@ -40,6 +40,12 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
     )
     TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
+    MENU_NODE_CHOICES = (
+        (0, _("Standard CMS page")),
+        (1, _("Navigation node without content")),
+        (2, _("Divider between navigation nodes")),
+    )
+
     X_FRAME_OPTIONS_INHERIT = 0
     X_FRAME_OPTIONS_DENY = 1
     X_FRAME_OPTIONS_SAMEORIGIN = 2
@@ -70,9 +76,11 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
     #
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
     soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
-                                    help_text=_("All ancestors will not be displayed in the navigation"))
-    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True, help_text=_(
-        "A unique identifier that is used with the page_url templatetag for linking to this page"))
+        help_text=_("All ancestors will not be displayed in the navigation."))
+    menu_node = models.SmallIntegerField(_("menu node"), choices=MENU_NODE_CHOICES, default=0,
+        help_text=_("Type of node shown in the navigation menu."))
+    reverse_id = models.CharField(_("id"), max_length=40, db_index=True, blank=True, null=True,
+        help_text=_("A unique identifier that is used with the page_url templatetag for linking to this page."))
     navigation_extenders = models.CharField(_("attached menu"), max_length=80, db_index=True, blank=True, null=True)
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
@@ -294,6 +302,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         target.login_required = self.login_required
         target.in_navigation = self.in_navigation
         target.soft_root = self.soft_root
+        target.menu_node = self.menu_node
         target.limit_visibility_in_menu = self.limit_visibility_in_menu
         target.navigation_extenders = self.navigation_extenders
         target.application_urls = self.application_urls

@@ -161,6 +161,18 @@ class ShowMenu(InclusionTag):
 register.tag(ShowMenu)
 
 
+@register.filter
+def is_page(node):
+    """Return true if the menu node is declared to be a standard CMS page"""
+    return node.attr['menu_node'] == 0
+
+
+@register.filter
+def is_divider(node):
+    """Return true if the menu node is declared to be a divider between nodes"""
+    return node.attr['menu_node'] == 2
+
+
 class ShowMenuBelowId(ShowMenu):
     name = 'show_menu_below_id'
     options = Options(

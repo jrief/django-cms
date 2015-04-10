@@ -302,7 +302,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         installed_plugins = plugin_pool.get_all_plugins(slot, page)
         return [cls.__name__ for cls in installed_plugins]
 
-    def get_parent_classes(self, slot, page):
+    def get_parent_classes(self, slot, page, parent=None):
         template = page and page.get_template() or None
 
         # config overrides..

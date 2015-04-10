@@ -30,7 +30,7 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
         template = page.template
     main_list = []
     for plugin in plugins_list:
-        allowed_parents = plugin().get_parent_classes(slot, page)
+        allowed_parents = plugin().get_parent_classes(slot, page, parent)
         if parent:
             ## skip to the next if this plugin is not allowed to be a child
             ## of the parent

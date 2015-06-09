@@ -206,7 +206,9 @@ def details(request, slug):
 
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
     xframe_options = page.get_xframe_options()
-    if xframe_options == Page.X_FRAME_OPTIONS_INHERIT:
+    # xframe_options can be None if there's no xframe information on the page
+    # (eg. a top-level page which has xframe options set to "inherit")
+    if xframe_options == Page.X_FRAME_OPTIONS_INHERIT or xframe_options is None:
         # This is when we defer to django's own clickjacking handling
         return response
 
@@ -231,11 +233,10 @@ def _cache_page(response):
         return response
     request = response._request
     save_cache = True
-    if hasattr(request, 'placeholders'):
-        for placeholder in request.placeholders:
-            if not placeholder.cache_placeholder:
-                save_cache = False
-                break
+    for placeholder in getattr(request, 'placeholders', []):
+        if not placeholder.cache_placeholder:
+            save_cache = False
+            break
     if hasattr(request, 'toolbar'):
         if request.toolbar.edit_mode or request.toolbar.show_toolbar:
             save_cache = False

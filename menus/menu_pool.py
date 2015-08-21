@@ -153,8 +153,9 @@ class MenuPool(object):
         else:
             cache_keys = CacheKey.objects.get_keys(site_id, language)
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
-        cache.delete_many(to_be_deleted)
-        cache_keys.delete()
+        if to_be_deleted:
+            cache.delete_many(to_be_deleted)
+            cache_keys.delete()
 
     def register_menu(self, menu_cls):
         from menus.base import Menu
@@ -209,6 +210,8 @@ class MenuPool(object):
         for menu_class_name in self.menus:
             menu = self.menus[menu_class_name]
             try:
+                if isinstance(menu, type):
+                    menu = menu()
                 nodes = menu.get_nodes(request)
             except NoReverseMatch:
                 # Apps might raise NoReverseMatch if an apphook does not yet

@@ -174,7 +174,6 @@ def page_to_node(page, home, cut):
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
     attr = {
-        'page': page,
         'soft_root': page.soft_root,
         'auth_required': page.login_required,
         'reverse_id': page.reverse_id,
@@ -253,6 +252,8 @@ class CMSMenu(Menu):
 
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
+            if not use_draft(request):
+                filters['title_set__published'] = True
 
         if not use_draft(request):
             page_queryset = page_queryset.published()
@@ -428,7 +429,8 @@ class SoftRootCutter(Modifier):
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
-        if post_cut:
+        # or if no id argument is provided, indicating {% show_menu_below_id %}
+        if post_cut or root_id:
             return nodes
         selected = None
         root_nodes = []

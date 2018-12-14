@@ -488,7 +488,7 @@ class Page(models.Model):
             if self.is_home:
                 return reverse('pages-root')
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)
-            return reverse('pages-details-by-slug', kwargs={"slug": path})
+            return reverse('pages-details-by-slug', kwargs={"domain": self.node.site.domain, "slug": path})
 
     def get_public_url(self, language=None, fallback=True):
         """

@@ -1338,7 +1338,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(object_id)
 
-        site = get_current_site()
+        #site = get_current_site()
         active_site = self.get_site(request)
         can_see_page = page_permissions.user_can_view_page(request.user, page, active_site)
 
@@ -1362,12 +1362,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         attrs += "&language=" + language
         url = page.get_absolute_url(language) + attrs
 
-        if site != active_site and page.node.site_id != site.pk:
-            # The user has selected a site using the site selector menu
-            # and the page is not available on the current site's tree.
-            # Redirect to the page url in the selected site
-            proto = 'https' if request.is_secure() else 'http'
-            url = "{}://{}{}".format(proto, active_site.domain, url)
+        # if site != active_site and page.node.site_id != site.pk:
+        #     # The user has selected a site using the site selector menu
+        #     # and the page is not available on the current site's tree.
+        #     # Redirect to the page url in the selected site
+        #     proto = 'https' if request.is_secure() else 'http'
+        #     url = "{}://{}{}".format(proto, active_site.domain, url)
         return HttpResponseRedirect(url)
 
     @require_POST

@@ -35,7 +35,7 @@ def _clean_redirect_url(redirect_url, language):
     return redirect_url
 
 
-def details(request, slug):
+def details(request, domain, slug):
     """
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.

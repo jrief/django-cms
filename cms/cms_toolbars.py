@@ -77,7 +77,7 @@ class PlaceholderToolbar(CMSToolbar):
             disabled = True
 
         url = '{url}?page={page}&language={lang}&edit'.format(
-            url=reverse("cms_wizard_create"),
+            url=reverse("cms_wizard_create", kwargs={'domain': self.page.node.site.domain}),
             page=page_pk,
             lang=self.toolbar.site_language,
         )
@@ -340,7 +340,7 @@ class PageToolbar(CMSToolbar):
 
         # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
         # page, if DEBUG == False this could cause a 404
-        return reverse('pages-root')
+        return reverse('pages-root', kwargs={'domain': self.page.node.site.domain})
 
     # Populate
 

@@ -77,7 +77,7 @@ class PlaceholderToolbar(CMSToolbar):
             disabled = True
 
         url = '{url}?page={page}&language={lang}&edit'.format(
-            url=reverse("cms_wizard_create", kwargs={'domain': self.page.node.site.domain}),
+            url=reverse("cms_wizard_create"),
             page=page_pk,
             lang=self.toolbar.site_language,
         )

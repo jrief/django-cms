@@ -154,8 +154,9 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     preview = 'preview' in request.GET
     path = request.path_info if use_path is None else use_path
 
+    site = get_current_site()
     if clean_path:
-        pages_root = reverse("pages-root")
+        pages_root = reverse("pages-root", kwargs={'domain': site.domain})
 
         if path.startswith(pages_root):
             path = path[len(pages_root):]
@@ -164,7 +165,6 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         if path.endswith("/"):
             path = path[:-1]
 
-    site = get_current_site()
     page = get_page_from_path(site, path, preview, draft)
 
     if draft and page and not user_can_view_page_draft(request.user, page):

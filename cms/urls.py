@@ -9,9 +9,9 @@ from cms.constants import SLUG_REGEXP
 
 
 if settings.APPEND_SLASH:
-    regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
+    regexp = r'^(?P<domain>[^/]+)/(?P<slug>%s)/$' % SLUG_REGEXP
 else:
-    regexp = r'^(?P<slug>%s)$' % SLUG_REGEXP
+    regexp = r'^(?P<domain>[^/]+)/(?P<slug>%s)$' % SLUG_REGEXP
 
 if apphook_pool.get_apphooks():
     # If there are some application urls, use special resolver,
@@ -25,5 +25,5 @@ urlpatterns.extend([
     url(r'^cms_login/$', views.login, name='cms_login'),
     url(r'^cms_wizard/', include('cms.wizards.urls')),
     url(regexp, views.details, name='pages-details-by-slug'),
-    url(r'^$', views.details, {'slug': ''}, name='pages-root'),
+    url(r'^(?P<domain>[^/]+)/$', views.details, {'slug': ''}, name='pages-root'),
 ])

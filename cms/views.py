@@ -175,7 +175,8 @@ def login(request):
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
 
     if not is_safe_url(url=redirect_to, host=request.get_host()):
-        redirect_to = reverse("pages-root")
+        site = get_current_site()
+        redirect_to = reverse("pages-root", kwargs={'domain': site.domain})
 
     if request.user.is_authenticated():
         return HttpResponseRedirect(redirect_to)

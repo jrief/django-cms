@@ -486,7 +486,7 @@ class Page(models.Model):
 
         with force_language(language):
             if self.is_home:
-                return reverse('pages-root')
+                return reverse('pages-root', kwargs={'domain': self.node.site.domain})
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)
             return reverse('pages-details-by-slug', kwargs={"domain": self.node.site.domain, "slug": path})
 

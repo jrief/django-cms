@@ -487,9 +487,6 @@ def get_view_id_list(user, site, check_global=True, use_cache=True):
 
 
 def has_generic_permission(page, user, action, site=None, check_global=True):
-    if site is None:
-        site = get_current_site()
-
     if page.publisher_is_draft:
         page_id = page.pk
     else:
@@ -508,5 +505,5 @@ def has_generic_permission(page, user, action, site=None, check_global=True):
     }
 
     func = actions_map[action]
-    page_ids = func(user, site, check_global=check_global)
+    page_ids = func(user, page.node.site, check_global=check_global)
     return page_ids == GRANT_ALL_PERMISSIONS or page_id in page_ids

@@ -137,10 +137,6 @@ class ShowMenu(InclusionTag):
         else:
             # new menu... get all the data so we can save a lot of queries
             menu_renderer = context.get('cms_menu_renderer')
-
-            if not menu_renderer:
-                menu_renderer = menu_pool.get_renderer(request)
-
             nodes = menu_renderer.get_nodes(namespace, root_id)
             if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
@@ -220,10 +216,6 @@ class ShowSubMenu(InclusionTag):
             return {'template': 'menu/empty.html'}
 
         menu_renderer = context.get('cms_menu_renderer')
-
-        if not menu_renderer:
-            menu_renderer = menu_pool.get_renderer(request)
-
         nodes = menu_renderer.get_nodes()
         children = []
         # adjust root_level so we cut before the specified level, not after
@@ -298,10 +290,6 @@ class ShowBreadcrumb(InclusionTag):
         ancestors = []
 
         menu_renderer = context.get('cms_menu_renderer')
-
-        if not menu_renderer:
-            menu_renderer = menu_pool.get_renderer(request)
-
         nodes = menu_renderer.get_nodes(breadcrumb=True)
 
         # Find home

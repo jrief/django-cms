@@ -27,6 +27,7 @@ from cms.constants import (
     PUBLISHER_STATE_DIRTY,
     PUBLISHER_STATE_PENDING,
 )
+from cms.context_processors import cms_settings
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
@@ -388,8 +389,8 @@ class BaseCMSTestCase(object):
     def get_context(self, path=None, page=None):
         if not path:
             path = self.get_pages_root()
-        context = {}
         request = self.get_request(path, page=page)
+        context = cms_settings(request)
         context['request'] = request
         return Context(context)
 

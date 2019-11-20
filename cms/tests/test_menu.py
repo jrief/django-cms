@@ -17,6 +17,7 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
+from cms.context_processors import cms_settings
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
@@ -584,6 +585,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
         # Prime the public menu cache
         context = self.get_context(path=public_page.get_absolute_url(), page=public_page)
+        context.update(cms_settings(context['request']))
         context['request'].session['cms_edit'] = False
 
         # Prime the cache
@@ -600,6 +602,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(CacheKey.objects.count(), 1)
 
         # Because its cached, only one query is made to the db
+        context.update(cms_settings(context['request']))
         with self.assertNumQueries(1):
             # The queries should be:
             #     get the menu cache key
@@ -609,6 +612,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         CacheKey.objects.all().delete()
 
         # The menu should be recalculated
+        context.update(cms_settings(context['request']))
         with self.assertNumQueries(5):
             # The queries should be:
             #     check if cache key exists
@@ -1101,6 +1105,7 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/')
             context = Context()
             context['request'] = request
+            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1122,6 +1127,7 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/de-p2/')
             context = Context()
             context['request'] = request
+            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1188,6 +1194,7 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/')
             context = Context()
             context['request'] = request
+            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1207,6 +1214,7 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/de-p2/')
             context = Context()
             context['request'] = request
+            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1242,6 +1250,7 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/')
             context = Context()
             context['request'] = request
+            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1253,6 +1262,7 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/de-p2/')
             context = Context()
             context['request'] = request
+            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']

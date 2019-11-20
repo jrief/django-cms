@@ -246,6 +246,7 @@ class MenuPool(object):
         self.discovered = False
 
     def get_renderer(self, request):
+        raise NotImplementedError("This method is not required any more")
         self.discover_menus()
         # Returns a menu pool wrapper that is bound
         # to the given request and can perform

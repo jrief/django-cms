@@ -17,7 +17,8 @@ def cms_settings(request):
         # We use lru_cache to avoid getting the manager
         # every time this function is called.
         from menus.menu_pool import menu_pool
-        return menu_pool.get_renderer(request)
+        menu_pool.discover_menus()
+        return MenuRenderer(pool=menu_pool, request=request)
 
     # Now use lazy() to avoid getting the menu renderer
     # up until the point is needed.

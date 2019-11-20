@@ -319,6 +319,12 @@ class BaseCMSTestCase(object):
 
         _rec(nodes)
 
+    def get_default_menu_renderer(self, request):
+        from menus.menu_pool import menu_pool, MenuRenderer
+
+        menu_pool.discover_menus()
+        return MenuRenderer(pool=menu_pool, request=request)
+
     def assertObjectExist(self, qs, **filter):
         try:
             return qs.get(**filter)

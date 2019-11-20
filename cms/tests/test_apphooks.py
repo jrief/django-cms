@@ -22,6 +22,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.constants import PUBLISHER_STATE_DIRTY
+from cms.context_processors import cms_settings
 from cms.models import Title, Page
 from cms.middleware.page import get_page
 from cms.test_utils.project.placeholderapp.models import Example1
@@ -877,7 +878,7 @@ class ApphooksTestCase(CMSTestCase):
         cache.clear()
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         with mock.patch("menus.menu_pool.logger.error"):
             nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
@@ -898,7 +899,7 @@ class ApphooksTestCase(CMSTestCase):
         create_title('de', 'de_title', page2, slug='slug')
         page2.publish('de')
         request = self.get_request('/page2/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
@@ -928,7 +929,8 @@ class ApphooksTestCase(CMSTestCase):
         # Public version
         request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
         request.current_page = get_page(request)
-        menu_nodes = menu_pool.get_renderer(request).get_nodes()
+        menu_renderer = cms_settings(request)['cms_menu_renderer']
+        menu_nodes = menu_renderer.get_nodes()
         self.assertEqual(len(menu_nodes), 2)
         self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
         self.assertEqual(menu_nodes[0].selected, False)
@@ -939,7 +941,8 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
             request.current_page = get_page(request)
-            menu_nodes = menu_pool.get_renderer(request).get_nodes()
+            menu_renderer = cms_settings(request)['cms_menu_renderer']
+            menu_nodes = menu_renderer.get_nodes()
             self.assertEqual(len(menu_nodes), 2)
             self.assertEqual(menu_nodes[0].id, homepage.pk)
             self.assertEqual(menu_nodes[0].selected, False)
@@ -968,7 +971,8 @@ class ApphooksTestCase(CMSTestCase):
         # Public version
         request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
         request.current_page = get_page(request)
-        menu_nodes = menu_pool.get_renderer(request).get_nodes()
+        menu_renderer = cms_settings(request)['cms_menu_renderer']
+        menu_nodes = menu_renderer.get_nodes()
         self.assertEqual(len(menu_nodes), 2)
         self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
         self.assertEqual(menu_nodes[0].selected, False)
@@ -979,7 +983,8 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
             request.current_page = get_page(request)
-            menu_nodes = menu_pool.get_renderer(request).get_nodes()
+            menu_renderer = cms_settings(request)['cms_menu_renderer']
+            menu_nodes = menu_renderer.get_nodes()
             self.assertEqual(len(menu_nodes), 2)
             self.assertEqual(menu_nodes[0].id, homepage.pk)
             self.assertEqual(menu_nodes[0].selected, False)

@@ -41,7 +41,7 @@ class BaseMenuTest(CMSTestCase):
         nodes = [node1, node2, node3, node4, node5]
         tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
         request = self.get_request(path)
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         renderer.apply_modifiers(tree, request)
         return tree, nodes
 
@@ -125,7 +125,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         # menus on a request basis.
 
         request_1 = self.get_request('/en/')
-        request_1_renderer = menu_pool.get_renderer(request_1)
+        request_1_renderer = self.get_default_menu_renderer(request_1)
 
         registered = menu_pool.get_registered_menus(for_rendering=False)
 
@@ -141,7 +141,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                     navigation_extenders='StaticMenu2')
 
         request_2 = self.get_request('/en/')
-        request_2_renderer = menu_pool.get_renderer(request_2)
+        request_2_renderer = self.get_default_menu_renderer(request_2)
 
         # The count should be 3 but grows to 5 because of the two published instances.
         self.assertEqual(len(request_2_renderer.menus), 5)
@@ -286,7 +286,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(response.status_code, 200)
         request = self.get_request()
 
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
 
         # test the cms menu class
         menu = renderer.get_menu('CMSMenu')
@@ -308,7 +308,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertRedirects(response, URL_CMS_PAGE)
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         renderer.draft_mode_active = True
         renderer.get_nodes()
         self.assertEqual(CacheKey.objects.count(), 1)
@@ -321,7 +321,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             page = Title.objects.drafts().get(slug=page_data_2['slug']).page
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = self.get_default_menu_renderer(request)
         renderer.draft_mode_active = True
         nodes = renderer.get_nodes()
         self.assertEqual(CacheKey.objects.count(), 1)
@@ -334,7 +334,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page = create_page('page to move', 'nav_playground.html', 'en', published=True)
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         renderer.draft_mode_active = True
         nodes_before = renderer.get_nodes()
         index_before = [i for i, s in enumerate(nodes_before) if s.title == page.get_title()]
@@ -349,7 +349,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(CacheKey.objects.count(), 0)
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         renderer.draft_mode_active = True
         nodes_after = renderer.get_nodes()
         index_after = [i for i, s in enumerate(nodes_after) if s.title == page.get_title()]
@@ -368,7 +368,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page = create_page('page to copy', 'nav_playground.html', 'en', published=True)
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         renderer.draft_mode_active = True
         nodes_before = renderer.get_nodes()
         self.assertEqual(CacheKey.objects.count(), 1)
@@ -387,7 +387,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(CacheKey.objects.count(), 0)
 
         request = self.get_request('/')
-        renderer = menu_pool.get_renderer(request)
+        renderer = self.get_default_menu_renderer(request)
         renderer.draft_mode_active = True
         nodes_after = renderer.get_nodes()
 
@@ -408,7 +408,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
         # Fallbacks on
         request = self.get_request(path='/de/', language='de')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(pages))
@@ -427,7 +427,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         lang_settings[1][1]['hide_untranslated'] = True
 
         with self.settings(CMS_LANGUAGES=lang_settings):
-            renderer = menu_pool.get_renderer(request)
+            renderer = cms_settings(request)['cms_menu_renderer']
             menu = renderer.get_menu('CMSMenu')
             nodes = menu.get_nodes(request)
             self.assertEqual(len(nodes), 0)
@@ -438,7 +438,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # Fallbacks on
         # This time however, the "de" translations are published.
         request = self.get_request(path='/de/', language='de')
-        renderer = menu_pool.get_renderer(request)
+        renderer = cms_settings(request)['cms_menu_renderer']
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(pages))
@@ -453,7 +453,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         request = self.get_request(path='/de/', language='de')
 
         with self.settings(CMS_LANGUAGES=lang_settings):
-            renderer = menu_pool.get_renderer(request)
+            renderer = cms_settings(request)['cms_menu_renderer']
             menu = renderer.get_menu('CMSMenu')
             nodes = menu.get_nodes(request)
 

@@ -128,7 +128,7 @@ class ShowMenu(InclusionTag):
                     extra_active, template, namespace, root_id, next_page):
         try:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
+            context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
 
@@ -211,7 +211,7 @@ class ShowSubMenu(InclusionTag):
             root_level = None
         try:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
+            context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
 
@@ -276,7 +276,7 @@ class ShowBreadcrumb(InclusionTag):
     def get_context(self, context, start_level, template, only_visible):
         try:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
+            context['request']
         except KeyError:
             return {'template': 'cms/content.html'}
         if not (isinstance(start_level, int) or start_level.isdigit()):

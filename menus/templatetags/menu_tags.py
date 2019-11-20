@@ -293,12 +293,10 @@ class ShowBreadcrumb(InclusionTag):
         nodes = menu_renderer.get_nodes(breadcrumb=True)
 
         # Find home
-        home = None
         root_url = unquote(reverse("pages-root"))
         home = next((node for node in nodes if node.get_absolute_url() == root_url), None)
 
         # Find selected
-        selected = None
         selected = next((node for node in nodes if node.selected), None)
 
         if selected and selected != home:

@@ -159,7 +159,7 @@ if __name__ == '__main__':
             env='DATABASE_URL',
             arg='--db-url',
             default='sqlite://localhost/local.sqlite'
-        ),
+            ),
         USE_TZ=app_manage.Config(
             env='USE_TZ',
             arg=app_manage.Flag('--use-tz'),

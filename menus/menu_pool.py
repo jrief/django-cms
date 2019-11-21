@@ -190,16 +190,14 @@ class MenuRenderer(object):
 
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
 
-        if not self.is_cached:
-            # No need to invalidate the internal lookup cache,
-            # just set the value directly.
-            self.__dict__['is_cached'] = True
-            # We need to have a list of the cache keys for languages and sites that
-            # span several processes - so we follow the Django way and share through
-            # the database. It's still cheaper than recomputing every time!
-            # This way we can selectively invalidate per-site and per-language,
-            # since the cache is shared but the keys aren't
-            CacheKey.objects.create(key=key, language=self.request_language, site=self.site.pk)
+        # No need to invalidate the internal lookup cache, just set the value directly.
+        # We need to have a list of the cache keys for languages and sites that
+        # span several processes - so we follow the Django way and share through
+        # the database. It's still cheaper than recomputing every time!
+        # This way we can selectively invalidate per-site and per-language,
+        # since the cache is shared but the keys aren't
+        tmp, self.__dict__['is_cached'] = CacheKey.objects.get_or_create(
+            key=key, language=self.request_language, site=self.site.pk)
         return final_nodes
 
     def _mark_selected(self, nodes):

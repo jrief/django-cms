@@ -10,7 +10,7 @@ def cms_settings(request):
     """
     Adds cms-related variables to the context.
     """
-    from menus.menu_pool import MenuRenderer
+    MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
 
     @lru_cache.lru_cache(maxsize=None)
     def _get_menu_renderer():

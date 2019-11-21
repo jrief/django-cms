@@ -4,6 +4,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six.moves.urllib.parse import urljoin
 
@@ -77,6 +78,7 @@ DEFAULTS = {
     'APP_NAME': None,
     'TOOLBAR_HIDE': False,
     'INTERNAL_IPS': [],
+    'MENU_RENDERER': 'menus.menu_pool.MenuRenderer',
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
     'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
@@ -104,6 +106,12 @@ def get_media_root():
 @default('CMS_MEDIA_URL')
 def get_media_url():
     return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
+
+
+@default('CMS_MENU_RENDERER')
+def get_menu_renderer():
+    menu_renderer = get_cms_setting('MENU_RENDERER')
+    return import_string(menu_renderer)
 
 
 @default('CMS_TOOLBAR_URL__EDIT_ON')
@@ -269,6 +277,7 @@ COMPLEX = {
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
+    'CMS_MENU_RENDERER': get_menu_renderer,
     'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
     'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
     'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__structure,

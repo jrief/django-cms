@@ -158,14 +158,13 @@ class MenuRenderer(object):
                 the node is put at the bottom of the list
         """
         key = self.cache_key
-
-        cached_nodes = cache.get(key, None)
-
-        if cached_nodes and self.is_cached:
+        if self.is_cached:
             # Only use the cache if the key is present in the database.
             # This prevents a condition where keys which have been removed
             # from the database due to a change in content, are still used.
-            return cached_nodes
+            cached_nodes = cache.get(key)
+            if cached_nodes:
+                return cached_nodes
 
         final_nodes = []
         toolbar = getattr(self.request, 'toolbar', None)

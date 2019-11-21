@@ -234,6 +234,21 @@ class MenuRenderer(object):
         MenuClass = self.menus[menu_name]
         return MenuClass(renderer=self)
 
+    def clear_cache(self, root_id):
+        """
+        This invalidates the cache for a given menu (site_id and language)
+        """
+        if all:
+            cache_keys = CacheKey.objects.get_keys()
+        else:
+            cache_keys = CacheKey.objects.get_keys(self.site.id, self.request_language)
+
+        to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
+
+        if to_be_deleted:
+            cache.delete_many(to_be_deleted)
+            cache_keys.delete()
+
 
 class MenuPool(object):
 
@@ -308,21 +323,6 @@ class MenuPool(object):
 
     def get_registered_modifiers(self):
         return self.modifiers
-
-    def clear(self, site_id=None, language=None, all=False):
-        '''
-        This invalidates the cache for a given menu (site_id and language)
-        '''
-        if all:
-            cache_keys = CacheKey.objects.get_keys()
-        else:
-            cache_keys = CacheKey.objects.get_keys(site_id, language)
-
-        to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
-
-        if to_be_deleted:
-            cache.delete_many(to_be_deleted)
-            cache_keys.delete()
 
     def register_menu(self, menu_cls):
         from menus.base import Menu

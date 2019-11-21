@@ -5,7 +5,6 @@ import json
 import sys
 import uuid
 
-
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
@@ -55,6 +54,7 @@ from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
+from cms.context_processors import cms_settings
 from cms.models import (
     EmptyTitle, Page, PageType,
     Title, CMSPlugin, PagePermission,
@@ -1123,6 +1123,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 translation=translation,
             )
             all_published = page.publish(language)
+            menu_renderer = cms_settings(request)['cms_menu_renderer']
+            menu_renderer.clear_cache(page)
+
             page = page.reload()
             self._send_post_page_operation(
                 request,

@@ -234,17 +234,23 @@ class MenuRenderer(object):
         MenuClass = self.menus[menu_name]
         return MenuClass(renderer=self)
 
-    def clear_cache(self, root_id):
+    def clear_cache(self, root_page=None):
         """
         This invalidates the cache for a given menu (site_id and language)
         """
-        if all:
-            cache_keys = CacheKey.objects.get_keys()
-        else:
-            cache_keys = CacheKey.objects.get_keys(self.site.id, self.request_language)
-
+        cache_keys = CacheKey.objects.get_keys(self.site.id, self.request_language)
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
+        if to_be_deleted:
+            cache.delete_many(to_be_deleted)
+            cache_keys.delete()
 
+    @classmethod
+    def clear_all_caches(cls, root_page=None):
+        """
+        This invalidates all caches for any site_id in any language
+        """
+        cache_keys = CacheKey.objects.get_keys()
+        to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
         if to_be_deleted:
             cache.delete_many(to_be_deleted)
             cache_keys.delete()

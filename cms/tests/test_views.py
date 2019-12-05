@@ -285,7 +285,8 @@ class ContextTests(CMSTestCase):
         self.client.get("/en/plain_view/")
 
         cache.clear()
-        menu_pool.clear()
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
         context._standard_context_processors = None
 
         # Number of queries when context processor is enabled
@@ -302,7 +303,8 @@ class ContextTests(CMSTestCase):
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, get_cms_setting('TEMPLATES')[0][0])
         cache.clear()
-        menu_pool.clear()
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
 
         # Number of queries when context processors is enabled
         with self.settings(**original_context):

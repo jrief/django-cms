@@ -1001,7 +1001,7 @@ class Page(models.Model):
         )
         return True
 
-    def clear_cache(self, language=None, placeholder=False):
+    def clear_cache(self, language=None, menu=False, placeholder=False):
         from cms.cache import invalidate_cms_page_cache
 
         if get_cms_setting('PAGE_CACHE'):
@@ -1015,6 +1015,10 @@ class Page(models.Model):
 
             for placeholder in placeholders:
                 placeholder.clear_cache(language, site_id=self.node.site_id)
+
+        if menu:
+            MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+            MenuRenderer.clear_all_caches(self)
 
     def unpublish(self, language, site=None):
         """

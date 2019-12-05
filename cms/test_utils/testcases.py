@@ -118,7 +118,8 @@ class BaseCMSTestCase(object):
         pass
 
     def _post_teardown(self):
-        menu_pool.clear()
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
         cache.clear()
         super(BaseCMSTestCase, self)._post_teardown()
         set_current_user(None)
@@ -320,9 +321,8 @@ class BaseCMSTestCase(object):
         _rec(nodes)
 
     def get_default_menu_renderer(self, request):
-        from menus.menu_pool import menu_pool, MenuRenderer
-
         menu_pool.discover_menus()
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
         return MenuRenderer(pool=menu_pool, request=request)
 
     def assertObjectExist(self, qs, **filter):

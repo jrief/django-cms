@@ -51,7 +51,8 @@ class BaseMenuTest(CMSTestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {'CMSMenu': self.old_menu['CMSMenu']}
-        menu_pool.clear(settings.SITE_ID)
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
         activate("en")
 
     def tearDown(self):
@@ -630,7 +631,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         CacheKey.objects.create(language="fr", site=1, key="a")
 
         self.assertEqual(CacheKey.objects.count(), 2)
-        menu_pool.clear(site_id=1, language='fr')
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_caches(site_id=1, language='fr')
         self.assertEqual(CacheKey.objects.count(), 0)
 
     def test_only_active_tree(self):
@@ -907,7 +909,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page4 = self.get_page(4)
         page4.in_navigation = True
         page4.save()
-        menu_pool.clear(settings.SITE_ID)
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
@@ -1298,7 +1301,8 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
 
     def tearDown(self):
         Page.objects.all().delete()
-        menu_pool.clear(all=True)
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
 
     def get_page(self, name):
         return Page.objects.public().get(title_set__slug=name)

@@ -29,8 +29,13 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2019-08-14 12:36+0000\n"
+=======
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+>>>>>>> divio/release/3.7.x
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 =======
 "POT-Creation-Date: 2019-11-19 11:09+0100\n"
@@ -1308,6 +1313,9 @@ msgstr "La pagina è cambiata nel frattempo, aggiornamento in corso ..."
 msgid "CMS-wide Shortcuts"
 msgstr ""
 >>>>>>> divio/develop
+
+msgid "CMS-wide Shortcuts"
+msgstr ""
 
 msgid "Bring up this help dialog"
 msgstr "Attiva questa finestra di aiuto"

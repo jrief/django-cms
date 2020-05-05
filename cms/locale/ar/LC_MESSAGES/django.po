@@ -6,10 +6,15 @@
 # Translators:
 # Ahmed H <info@draco-003.com>, 2013
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # Ali Khalel <ali.khalel@gmail.com>, 2019
 >>>>>>> divio/develop
 # Bashar Al-Abdulhadi, 2013-2015,2017,2019
+=======
+# Ali Khalel <ali.khalel@gmail.com>, 2019
+# Bashar Al-Abdulhadi, 2013-2015,2017,2019-2020
+>>>>>>> divio/release/3.7.x
 # Bashar Al-Abdulhadi, 2013-2014
 # Bashar Ghadanfar <10.tens@gmail.com>, 2017
 # Jonas Obrist <me@ojii.ch>, 2011
@@ -22,8 +27,13 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2019-02-07 11:07+0000\n"
+=======
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+>>>>>>> divio/release/3.7.x
 "Last-Translator: Bashar Al-Abdulhadi\n"
 =======
 "POT-Creation-Date: 2019-11-19 11:09+0100\n"

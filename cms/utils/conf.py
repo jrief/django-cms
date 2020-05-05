@@ -6,7 +6,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
-from django.utils.six.moves.urllib.parse import urljoin
+
+from urllib.parse import urljoin
 
 from cms import constants
 from cms import __version__

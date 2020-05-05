@@ -13,8 +13,13 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2018-11-20 14:35+0000\n"
+=======
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+>>>>>>> divio/release/3.7.x
 "Last-Translator: Damir <damir.arbula@gmail.com>\n"
 =======
 "POT-Creation-Date: 2019-11-19 11:09+0100\n"
@@ -523,7 +528,7 @@ msgid "Unpublish page"
 msgstr "Zahtjev za obustavljanje objave"
 
 msgid "Publish page"
-msgstr "zahtjev za objavljivanje "
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Da li želite vratiti na Live inačicu stranice?"

@@ -10,8 +10,13 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2018-11-27 21:50+0000\n"
+=======
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+>>>>>>> divio/release/3.7.x
 "Last-Translator: Song M. Kim <songmink@hawaii.edu>\n"
 =======
 "POT-Creation-Date: 2019-11-19 11:09+0100\n"

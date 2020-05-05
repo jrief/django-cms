@@ -31,6 +31,7 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2019-07-03 17:29+0000\n"
 "Last-Translator: Rafaela Santos <faelaphoenix@gmail.com>\n"
@@ -39,6 +40,11 @@ msgstr ""
 "PO-Revision-Date: 2019-11-13 08:54+0000\n"
 "Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
 >>>>>>> divio/develop
+=======
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: Guilherme Vierno <guilhermevierno@gmail.com>\n"
+>>>>>>> divio/release/3.7.x
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -538,10 +544,10 @@ msgid "Display in navigation"
 msgstr "Exibir na navegação"
 
 msgid "Unpublish page"
-msgstr "req. para depublicar"
+msgstr ""
 
 msgid "Publish page"
-msgstr "req. para publicar"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Tem certeza que deseja reverter ao original?"
@@ -1306,12 +1312,17 @@ msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 msgid "Bring up this help dialog"
 msgstr "Abra este diálogo de ajuda"
 =======
 msgid "CMS-wide Shortcuts"
 msgstr ""
 >>>>>>> divio/develop
+=======
+msgid "CMS-wide Shortcuts"
+msgstr ""
+>>>>>>> divio/release/3.7.x
 
 msgid "Bring up this help dialog"
 msgstr "Abra este diálogo de ajuda"

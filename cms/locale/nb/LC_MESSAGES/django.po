@@ -17,8 +17,13 @@ msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2019-08-30 07:27+0000\n"
+=======
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+>>>>>>> divio/release/3.7.x
 "Last-Translator: Erlend Dalen <erlend.dalen@gmail.com>\n"
 =======
 "POT-Creation-Date: 2019-11-19 11:09+0100\n"
@@ -1319,6 +1324,10 @@ msgstr "Fokus på verktøylinja"
 msgid "Structureboard"
 msgstr ""
 >>>>>>> divio/develop
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

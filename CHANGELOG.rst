@@ -6,7 +6,7 @@ Changelog
 3.7.3 (unreleased)
 ==================
 
-* ...
+* Wraps long page titles in Page tree/list view to prevent horizontal scrolling.
 
 
 3.7.2 (2020-04-22)

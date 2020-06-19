@@ -3,10 +3,13 @@ Changelog
 =========
 
 
-3.7.3 (unreleased)
+3.7.3 (2020-05-27)
 ==================
 
-* Wraps long page titles in Page tree/list view to prevent horizontal scrolling.
+* Fixed apphooks config select in Firefox
+* Fixed compatibility errors on python 2
+* Fixed long page titles in Page tree/list view to prevent horizontal scrolling
+* Adapted plugin documentations
 
 
 3.7.2 (2020-04-22)
@@ -49,6 +52,7 @@ Changelog
 * Improved documentation related to nested plugins.
 * Updated installation tutorial.
 * Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
+* Updated 'How to create Plugins' Tutorial.
 
 
 3.7.0 (2019-09-25)

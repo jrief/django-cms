@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import copy
-from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
@@ -17,9 +16,9 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
-from cms.context_processors import cms_settings
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
@@ -41,7 +40,7 @@ class BaseMenuTest(CMSTestCase):
         nodes = [node1, node2, node3, node4, node5]
         tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
         request = self.get_request(path)
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         renderer.apply_modifiers(tree, request)
         return tree, nodes
 
@@ -51,8 +50,7 @@ class BaseMenuTest(CMSTestCase):
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
         menu_pool.menus = {'CMSMenu': self.old_menu['CMSMenu']}
-        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
-        MenuRenderer.clear_all_caches()
+        menu_pool.clear(settings.SITE_ID)
         activate("en")
 
     def tearDown(self):
@@ -126,7 +124,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         # menus on a request basis.
 
         request_1 = self.get_request('/en/')
-        request_1_renderer = self.get_default_menu_renderer(request_1)
+        request_1_renderer = menu_pool.get_renderer(request_1)
 
         registered = menu_pool.get_registered_menus(for_rendering=False)
 
@@ -142,7 +140,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                     navigation_extenders='StaticMenu2')
 
         request_2 = self.get_request('/en/')
-        request_2_renderer = self.get_default_menu_renderer(request_2)
+        request_2_renderer = menu_pool.get_renderer(request_2)
 
         # The count should be 3 but grows to 5 because of the two published instances.
         self.assertEqual(len(request_2_renderer.menus), 5)
@@ -287,7 +285,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(response.status_code, 200)
         request = self.get_request()
 
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
 
         # test the cms menu class
         menu = renderer.get_menu('CMSMenu')
@@ -309,7 +307,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertRedirects(response, URL_CMS_PAGE)
 
         request = self.get_request('/')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         renderer.get_nodes()
         self.assertEqual(CacheKey.objects.count(), 1)
@@ -322,7 +320,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             page = Title.objects.drafts().get(slug=page_data_2['slug']).page
 
         request = self.get_request('/')
-        renderer = self.get_default_menu_renderer(request)
+        renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes = renderer.get_nodes()
         self.assertEqual(CacheKey.objects.count(), 1)
@@ -335,7 +333,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page = create_page('page to move', 'nav_playground.html', 'en', published=True)
 
         request = self.get_request('/')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes_before = renderer.get_nodes()
         index_before = [i for i, s in enumerate(nodes_before) if s.title == page.get_title()]
@@ -350,7 +348,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(CacheKey.objects.count(), 0)
 
         request = self.get_request('/')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes_after = renderer.get_nodes()
         index_after = [i for i, s in enumerate(nodes_after) if s.title == page.get_title()]
@@ -369,7 +367,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page = create_page('page to copy', 'nav_playground.html', 'en', published=True)
 
         request = self.get_request('/')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes_before = renderer.get_nodes()
         self.assertEqual(CacheKey.objects.count(), 1)
@@ -388,7 +386,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(CacheKey.objects.count(), 0)
 
         request = self.get_request('/')
-        renderer = self.get_default_menu_renderer(request)
+        renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes_after = renderer.get_nodes()
 
@@ -409,7 +407,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
         # Fallbacks on
         request = self.get_request(path='/de/', language='de')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(pages))
@@ -428,7 +426,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         lang_settings[1][1]['hide_untranslated'] = True
 
         with self.settings(CMS_LANGUAGES=lang_settings):
-            renderer = cms_settings(request)['cms_menu_renderer']
+            renderer = menu_pool.get_renderer(request)
             menu = renderer.get_menu('CMSMenu')
             nodes = menu.get_nodes(request)
             self.assertEqual(len(nodes), 0)
@@ -439,7 +437,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # Fallbacks on
         # This time however, the "de" translations are published.
         request = self.get_request(path='/de/', language='de')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
         self.assertEqual(len(nodes), len(pages))
@@ -454,7 +452,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         request = self.get_request(path='/de/', language='de')
 
         with self.settings(CMS_LANGUAGES=lang_settings):
-            renderer = cms_settings(request)['cms_menu_renderer']
+            renderer = menu_pool.get_renderer(request)
             menu = renderer.get_menu('CMSMenu')
             nodes = menu.get_nodes(request)
 
@@ -586,7 +584,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
         # Prime the public menu cache
         context = self.get_context(path=public_page.get_absolute_url(), page=public_page)
-        context.update(cms_settings(context['request']))
         context['request'].session['cms_edit'] = False
 
         # Prime the cache
@@ -603,7 +600,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(CacheKey.objects.count(), 1)
 
         # Because its cached, only one query is made to the db
-        context.update(cms_settings(context['request']))
         with self.assertNumQueries(1):
             # The queries should be:
             #     get the menu cache key
@@ -613,7 +609,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         CacheKey.objects.all().delete()
 
         # The menu should be recalculated
-        context.update(cms_settings(context['request']))
         with self.assertNumQueries(5):
             # The queries should be:
             #     check if cache key exists
@@ -631,8 +626,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         CacheKey.objects.create(language="fr", site=1, key="a")
 
         self.assertEqual(CacheKey.objects.count(), 2)
-        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
-        MenuRenderer.clear_caches(site_id=1, language='fr')
+        menu_pool.clear(site_id=1, language='fr')
         self.assertEqual(CacheKey.objects.count(), 0)
 
     def test_only_active_tree(self):
@@ -909,8 +903,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         page4 = self.get_page(4)
         page4.in_navigation = True
         page4.save()
-        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
-        MenuRenderer.clear_all_caches()
+        menu_pool.clear(settings.SITE_ID)
         context = self.get_context()
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
         tpl.render(context)
@@ -1108,7 +1101,6 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/')
             context = Context()
             context['request'] = request
-            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1130,7 +1122,6 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/de-p2/')
             context = Context()
             context['request'] = request
-            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1197,7 +1188,6 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/')
             context = Context()
             context['request'] = request
-            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1217,7 +1207,6 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/de-p2/')
             context = Context()
             context['request'] = request
-            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1253,7 +1242,6 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/')
             context = Context()
             context['request'] = request
-            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1265,7 +1253,6 @@ class MenuTests(BaseMenuTest):
             request = self.get_request('/en/de-p2/')
             context = Context()
             context['request'] = request
-            context.update(cms_settings(request))
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
             tpl.render(context)
             nodes = context['children']
@@ -1301,8 +1288,8 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
 
     def tearDown(self):
         Page.objects.all().delete()
-        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
-        MenuRenderer.clear_all_caches()
+        menu_pool.clear(all=True)
+        super(AdvancedSoftrootTests, self).tearDown()
 
     def get_page(self, name):
         return Page.objects.public().get(title_set__slug=name)

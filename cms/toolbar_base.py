@@ -1,20 +1,11 @@
 from django.forms import MediaDefiningClass
-<<<<<<< HEAD
-
-from six import with_metaclass
-=======
->>>>>>> divio/release/3.8.x
 
 from cms.exceptions import LanguageError
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import get_language_object
 
 
-<<<<<<< HEAD
-class CMSToolbar(with_metaclass(MediaDefiningClass)):
-=======
 class CMSToolbar(metaclass=MediaDefiningClass):
->>>>>>> divio/release/3.8.x
     supported_apps = None
 
     def __init__(self, request, toolbar, is_current_app, app_path):

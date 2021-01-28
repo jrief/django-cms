@@ -22,15 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: Jiří Vírava <appukonrad@gmail.com>\n"
-=======
 "POT-Creation-Date: 2020-10-28 10:45+0100\n"
 "PO-Revision-Date: 2020-05-28 15:42+0000\n"
 "Last-Translator: Jakub Dorňák <jakub.dornak@misli.cz>\n"
->>>>>>> divio/release/3.8.x
 "Language-Team: Czech (http://www.transifex.com/divio/django-cms/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -530,14 +524,10 @@ msgid "Display in navigation"
 msgstr "Zobrazit v navigaci"
 
 msgid "Unpublish page"
-<<<<<<< HEAD
-msgstr ""
-=======
 msgstr "Depublikovat stránku"
->>>>>>> divio/release/3.8.x
 
 msgid "Publish page"
-msgstr ""
+msgstr "Publikovat stránku"
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Opravdu se chcete zahodit rozpracované změny?"

@@ -1,11 +1,7 @@
 import json
 
 from django.utils.encoding import force_text
-<<<<<<< HEAD
-from django.utils.translation import override as force_language, ugettext
-=======
 from django.utils.translation import override as force_language, gettext
->>>>>>> divio/release/3.8.x
 
 from six import text_type
 

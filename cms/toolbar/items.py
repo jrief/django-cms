@@ -33,11 +33,7 @@ def may_be_lazy(thing):
         return thing
 
 
-<<<<<<< HEAD
-class ToolbarAPIMixin(with_metaclass(ABCMeta)):
-=======
 class ToolbarAPIMixin(metaclass=ABCMeta):
->>>>>>> divio/release/3.8.x
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
@@ -179,11 +175,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
         return item
 
 
-<<<<<<< HEAD
-class BaseItem(with_metaclass(ABCMeta)):
-=======
 class BaseItem(metaclass=ABCMeta):
->>>>>>> divio/release/3.8.x
     toolbar = None
     template = None
 
@@ -381,11 +373,7 @@ class Break(BaseItem):
         self.identifier = identifier
 
 
-<<<<<<< HEAD
-class BaseButton(with_metaclass(ABCMeta)):
-=======
 class BaseButton(metaclass=ABCMeta):
->>>>>>> divio/release/3.8.x
     toolbar = None
     template = None
 

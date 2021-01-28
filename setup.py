@@ -30,19 +30,6 @@ CLASSIFIERS = [
     'Framework :: Django',
     'Framework :: Django :: 2.2',
     'Framework :: Django :: 3.0',
-<<<<<<< HEAD
-]
-
-INSTALL_REQUIREMENTS = [
-    'Django>=1.11,<4',
-    'django-classy-tags>=0.7.2',
-    'django-formtools>=2.1',
-    'django-treebeard>=4.3',
-    'django-sekizai>=0.7',
-    'djangocms-admin-style>=1.2',
-    'six',
-]
-=======
     'Framework :: Django :: 3.1',
     'Topic :: Internet :: WWW/HTTP',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
@@ -51,7 +38,6 @@ INSTALL_REQUIREMENTS = [
     'Topic :: Software Development :: Libraries :: Application Frameworks',
 ]
 
->>>>>>> divio/release/3.8.x
 
 setup(
     name='django-cms',

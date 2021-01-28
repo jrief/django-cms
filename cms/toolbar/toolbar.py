@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 import functools
 import operator
@@ -110,7 +109,7 @@ class CMSToolbar(BaseToolbar):
     """
 
     def __init__(self, request, request_path=None, _async=False):
-        super(CMSToolbar, self).__init__()
+        super().__init__()
         self._async = _async
         self.right_items = []
         self.left_items = []
@@ -498,4 +497,4 @@ class EmptyToolbar(BaseToolbar):
 
     def __init__(self, request):
         self.request = request
-        super(EmptyToolbar, self).__init__()
+        super().__init__()

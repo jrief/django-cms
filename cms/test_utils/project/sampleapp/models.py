@@ -7,7 +7,6 @@ from cms.models.fields import PageField, PlaceholderField
 from six import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Category(MP_Node):
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)

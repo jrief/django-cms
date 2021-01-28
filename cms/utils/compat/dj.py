@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import six
 
 from functools import WRAPPER_ASSIGNMENTS
@@ -17,29 +18,22 @@ try:
     from django.utils.deprecation import MiddlewareMixin
 except ImportError:
     class MiddlewareMixin(object): pass
+=======
+from functools import WRAPPER_ASSIGNMENTS
+>>>>>>> divio/release/3.8.x
 
-try:
-    from django.urls import URLResolver  # nopyflakes
-    from django.urls.resolvers import RegexPattern, URLPattern  # nopyflakes
-except ImportError:
-    # django 1.11 support
-    from django.core.urlresolvers import RegexURLResolver as URLResolver, RegexURLPattern as URLPattern  # nopyflakes
-    class RegexPattern: pass
-
-try:
-    from django.urls import LocalePrefixPattern  # nopyflakes
-except ImportError:
-    # Only for django 1.11
-    from django.core.urlresolvers import LocaleRegexURLResolver as LocalePrefixPattern  # nopyflakes
+from django.apps import apps
 
 
-# TODO: move these helpers out of compat?
+__all__ = ['is_installed', 'installed_apps']
+
 def is_installed(app_name):
     return apps.is_installed(app_name)
 
 def installed_apps():
     return [app.name for app in apps.get_app_configs()]
 
+<<<<<<< HEAD
 def get_app_paths():
     return [app.path for app in apps.get_app_configs()]
 
@@ -54,3 +48,7 @@ def available_attrs(fn):
 
 def get_middleware():
     return settings.MIDDLEWARE
+=======
+def available_attrs(fn):
+    return WRAPPER_ASSIGNMENTS
+>>>>>>> divio/release/3.8.x

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q
 from django.utils.encoding import force_text
@@ -8,7 +7,6 @@ from cms.models import CMSPlugin, Placeholder
 from six import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class AliasPluginModel(CMSPlugin):
     cmsplugin_ptr = models.OneToOneField(
         CMSPlugin,

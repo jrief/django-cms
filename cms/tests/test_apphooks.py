@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 import mock
 
@@ -15,15 +14,12 @@ from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 
-from six import string_types
-
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.context_processors import cms_settings
 from cms.models import Title, Page
 from cms.middleware.page import get_page
 from cms.test_utils.project.placeholderapp.models import Example1
@@ -118,7 +114,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, string_types):
+        if isinstance(title_langs, str):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
             titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
@@ -879,7 +875,7 @@ class ApphooksTestCase(CMSTestCase):
         cache.clear()
 
         request = self.get_request('/')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         with mock.patch("menus.menu_pool.logger.error"):
             nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
@@ -900,7 +896,7 @@ class ApphooksTestCase(CMSTestCase):
         create_title('de', 'de_title', page2, slug='slug')
         page2.publish('de')
         request = self.get_request('/page2/')
-        renderer = cms_settings(request)['cms_menu_renderer']
+        renderer = menu_pool.get_renderer(request)
         nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
@@ -930,8 +926,7 @@ class ApphooksTestCase(CMSTestCase):
         # Public version
         request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
         request.current_page = get_page(request)
-        menu_renderer = cms_settings(request)['cms_menu_renderer']
-        menu_nodes = menu_renderer.get_nodes()
+        menu_nodes = menu_pool.get_renderer(request).get_nodes()
         self.assertEqual(len(menu_nodes), 2)
         self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
         self.assertEqual(menu_nodes[0].selected, False)
@@ -942,8 +937,7 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             request = self.get_request(self.get_edit_on_url('/en/en-p2/'))
             request.current_page = get_page(request)
-            menu_renderer = cms_settings(request)['cms_menu_renderer']
-            menu_nodes = menu_renderer.get_nodes()
+            menu_nodes = menu_pool.get_renderer(request).get_nodes()
             self.assertEqual(len(menu_nodes), 2)
             self.assertEqual(menu_nodes[0].id, homepage.pk)
             self.assertEqual(menu_nodes[0].selected, False)
@@ -972,8 +966,7 @@ class ApphooksTestCase(CMSTestCase):
         # Public version
         request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
         request.current_page = get_page(request)
-        menu_renderer = cms_settings(request)['cms_menu_renderer']
-        menu_nodes = menu_renderer.get_nodes()
+        menu_nodes = menu_pool.get_renderer(request).get_nodes()
         self.assertEqual(len(menu_nodes), 2)
         self.assertEqual(menu_nodes[0].id, homepage.publisher_public_id)
         self.assertEqual(menu_nodes[0].selected, False)
@@ -984,8 +977,7 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             request = self.get_request(self.get_edit_on_url('/en/en-p2/settings/'))
             request.current_page = get_page(request)
-            menu_renderer = cms_settings(request)['cms_menu_renderer']
-            menu_nodes = menu_renderer.get_nodes()
+            menu_nodes = menu_pool.get_renderer(request).get_nodes()
             self.assertEqual(len(menu_nodes), 2)
             self.assertEqual(menu_nodes[0].id, homepage.pk)
             self.assertEqual(menu_nodes[0].selected, False)

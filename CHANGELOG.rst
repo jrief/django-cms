@@ -2,40 +2,35 @@
 Changelog
 =========
 
+Unreleased
+==================
+
+* Fixed builds on RTD
+* Remove debug print from apphook_reload
+* Enforce use of coverage > 4 for python 3.8 support
+* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Improved performance of ``cms list plugins`` command
+* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
+* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
+* Updated documentation links
+* Added support for Github Actions based CI.
+* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Remove travis integration from the project as the project has moved to Github Actions.
+* Fix all GitHub actions tests run on pull requests
+* Repair broken docs link to users/index.rst
+* Fixed missing builtin arguments on main ``cms`` management command causing it to crash
+* Fixed template label nested translation
+* Few changes in docs/contributing/code.rst
+* Add support for Django 3.2 LTS version
+* removed zh and zh_hans translation (keep zh_CN and zh_TW)
+
+
 next
 ====
 
 * Make the width of modal dialog popups configurable through the settings directive
   ``CMS_MODAL_DIALOG_WIDTH``.
-
-
-3.7.4 (2020-07-21)
-==================
-
-* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
-
-
-3.7.3 (2020-05-27)
-==================
-
-* Fixed apphooks config select in Firefox
-* Fixed compatibility errors on python 2
-* Fixed long page titles in Page tree/list view to prevent horizontal scrolling
-* Adapted plugin documentations
-
-
-3.7.2 (2020-04-22)
-==================
-
-* Added support for Django 3.0
-* Added support for Python 3.8
-* migrated from ``django.utils.six`` to the six package
-* migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
-* migrated from ``render_to_response`` to ``render`` in ``cms.views``
-* added ``cms.utils.compat.dj.available_attrs``
-* added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
-* replaced ``staticfiles`` and ``admin_static`` with ``static``
-* replaced djangocms-helper with django-app-helper
 
 
 3.8.0 (2020-10-28)

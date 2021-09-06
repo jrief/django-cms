@@ -57,7 +57,7 @@ class PageExtensionAdmin(ExtensionAdmin):
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
-        return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)
+        return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)  # grandparent super
 
 
 class TitleExtensionAdmin(ExtensionAdmin):

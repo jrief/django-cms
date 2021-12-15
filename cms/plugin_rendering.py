@@ -198,8 +198,9 @@ class ContentRenderer(BaseRenderer):
     def placeholder_cache_is_enabled(self):
         if not get_cms_setting('PLACEHOLDER_CACHE'):
             return False
-        if self.request.user.is_staff:
-            return False
+        # temporarily deactivated for django-cms-uniweb
+        # if self.request.user.is_staff:
+        #    return False
         return not self._placeholders_are_editable
 
     def render_placeholder(self, placeholder, context, language=None, page=None,

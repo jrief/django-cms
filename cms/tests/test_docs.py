@@ -37,13 +37,13 @@ def has_no_internet():
 
 
 @contextmanager
-def tmp_list_append(l, x):
-    l.append(x)
+def tmp_list_append(lst, x):
+    lst.append(x)
     try:
         yield
     finally:
-        if x in l:
-            l.remove(x)
+        if x in lst:
+            lst.remove(x)
 
 
 class DocsTestCase(CMSTestCase):
@@ -65,7 +65,7 @@ class DocsTestCase(CMSTestCase):
             )
             try:
                 app.build()
-            except:
+            except:  # noqa: E722
                 print(status.getvalue())
                 raise
 
@@ -98,6 +98,6 @@ class DocsTestCase(CMSTestCase):
                 except SphinxWarning:
                     # while normally harmless, causes a test failure
                     pass
-                except:
+                except:  # noqa: E722
                     print(status.getvalue())
                     raise

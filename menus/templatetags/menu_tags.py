@@ -3,7 +3,7 @@ from urllib.parse import unquote
 from django import template
 from django.contrib.sites.models import Site
 from django.urls import reverse, NoReverseMatch
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import get_language, gettext
 
 from six.moves.urllib.parse import unquote
@@ -155,16 +155,14 @@ class ShowMenu(InclusionTag):
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_renderer.apply_modifiers(children, namespace, root_id, post_cut=True)
 
-        try:
-            context['children'] = children
-            context['template'] = template
-            context['from_level'] = from_level
-            context['to_level'] = to_level
-            context['extra_inactive'] = extra_inactive
-            context['extra_active'] = extra_active
-            context['namespace'] = namespace
-        except:
-            context = {"template": template}
+        context['children'] = children
+        context['template'] = template
+        context['from_level'] = from_level
+        context['to_level'] = to_level
+        context['extra_inactive'] = extra_inactive
+        context['extra_active'] = extra_active
+        context['namespace'] = namespace
+
         return context
 
 
@@ -287,8 +285,9 @@ class ShowBreadcrumb(InclusionTag):
             start_level = 0
         try:
             only_visible = bool(int(only_visible))
-        except:
+        except TypeError:
             only_visible = bool(only_visible)
+
         ancestors = []
 
         menu_renderer = context.get('cms_menu_renderer')
@@ -328,11 +327,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return force_text(gettext(language))
+        return force_str(gettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return force_text(gettext(language))
+    return force_str(gettext(language))
 
 
 def _short_language_marker(language, lang_code):

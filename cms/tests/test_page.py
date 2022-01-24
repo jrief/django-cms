@@ -209,6 +209,14 @@ class PagesTestCase(TransactionCMSTestCase):
         new_slug = get_available_slug(site, 'test-copy', 'en')
         self.assertTrue(new_slug, 'test-copy-11')
 
+    def test_get_available_slug_recursion_exclude_current(self):
+        """ Checks cms.utils.page.get_available_slug for excluding the current page
+        """
+        site = get_current_site()
+        base = create_page('test', 'nav_playground.html', 'en', published=True)
+        new_slug = get_available_slug(site, 'test', 'en', current=base)
+        self.assertTrue(new_slug, 'test')
+
     def test_path_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
         """
@@ -674,6 +682,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
 
+    def test_get_page_from_request_without_cache_when_has_use_path_argument(self):
+        request = self.get_request('/test')
+        request._current_page_cache = True
+        found_page = get_page_from_request(request, 'page_path')
+        self.assertIsNone(found_page)
+
     def test_ancestor_expired(self):
         yesterday = tz_now() - datetime.timedelta(days=1)
         tomorrow = tz_now() + datetime.timedelta(days=1)
@@ -758,6 +772,16 @@ class PagesTestCase(TransactionCMSTestCase):
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
+
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            copied = self.copy_page(page2, page2)
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2/test-page-2/')
+            copied = self.move_page(copied, page2, position='left')
+            copied.reload()
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2-copy-2/')
 
     def test_page_and_title_repr(self):
         non_saved_page = Page()
@@ -1137,6 +1161,59 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(endpoint)
             self.assertContains(resp, public_text)
             self.assertNotContains(resp, draft_text)
+
+    def test_translated_subpage_title_path_regeneration(self):
+        """
+        When a child page is created with multiple translations before parent translation,
+        child title translation path should be regenerated to take into account parent path.
+
+        This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
+        where the slug was not regenerated.
+        """
+        parent = create_page(
+            'en-parent', "nav_playground.html", 'en',
+            slug='en-parent', published=True
+        )
+        child = create_page(
+            'en-child', "nav_playground.html", 'en',
+            slug='en-child', parent=parent, published=True
+        )
+        create_title('de', 'de-child', child, slug='de-child')
+
+        # Parent 'de' title created after child translation
+        create_title('de', 'de-parent', parent, slug='de-parent')
+        parent._update_title_path_recursive('de', slug='de-parent')
+        parent.clear_cache(menu=True)
+
+        parent.publish('de')
+        child.publish('de')
+
+        response = self.client.get('/de/de-parent/de-child/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_subpage_title_path_regeneration_after_parent_slug_change(self):
+        """
+        When a parent page slug changes,
+        the child title path should be regenerated.
+
+        This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
+        where the slug was not regenerated.
+        """
+        parent = create_page('BadFoo', "nav_playground.html", 'en',
+                             slug = 'badfoo', published=True)
+        child = create_page('Bar', "nav_playground.html", 'en',
+                            slug = 'bar', parent=parent, published=True)
+        title = parent.get_title_obj(language='en', fallback=False)
+        title.title='Foo'
+        title.save()
+        parent._update_title_path_recursive('en', slug='foo')
+        parent.clear_cache(menu=True)
+
+        parent.publish('en')
+        child.publish('en')
+
+        response = self.client.get('/en/foo/bar/')
+        self.assertEqual(response.status_code, 200)
 
 
 class PageTreeTests(CMSTestCase):

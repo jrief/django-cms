@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from django.contrib import admin
 from django.db import models
 from django.template.defaultfilters import title
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
@@ -39,7 +39,7 @@ class Placeholder(models.Model):
     class Meta:
         app_label = 'cms'
         permissions = (
-            (u"use_structure", u"Can use Structure mode"),
+            ("use_structure", "Can use Structure mode"),
         )
 
     def __str__(self):
@@ -258,7 +258,7 @@ class Placeholder(models.Model):
                     try:
                         if field.exists():
                             self._attached_fields_cache.append(rel.field)
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_fields_cache
 
@@ -282,7 +282,7 @@ class Placeholder(models.Model):
                         if field.exists():
                             self._attached_field_cache = rel.field
                             break
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_field_cache
 
@@ -356,6 +356,12 @@ class Placeholder(models.Model):
             return self.cmsplugin_set.filter(language=language).order_by('path')
         else:
             return self.cmsplugin_set.all().order_by('path')
+
+    def get_child_plugins(self, language=None):
+        if language:
+            return self.cmsplugin_set.filter(language=language, parent__isnull=True).order_by('path')
+        else:
+            return self.cmsplugin_set.filter(parent__isnull=True).order_by('path')
 
     def get_filled_languages(self):
         """
@@ -447,7 +453,7 @@ class Placeholder(models.Model):
                             'ignoring.' % {
                                 'plugin_class': plugin.__class__.__name__,
                                 'pk': instance.pk,
-                                'value': force_text(plugin_expiration),
+                                'value': force_str(plugin_expiration),
                             })
                         continue
                 else:
@@ -465,7 +471,7 @@ class Placeholder(models.Model):
                         'get_cache_expiration(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(plugin_expiration),
+                            'value': force_str(plugin_expiration),
                         })
                     continue
 
@@ -506,6 +512,10 @@ class Placeholder(models.Model):
 
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
+
+        # Force to clear cache when attached model is not a Page or a StaticPlaceholder, otherwise cache is never invalidated when using PlaceholderField
+        elif clear_cache is False:
+            self.clear_cache(language)
 
     def get_plugin_tree_order(self, language, parent_id=None):
         """
@@ -562,7 +572,7 @@ class Placeholder(models.Model):
                         'get_vary_cache_on(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(vary_on),
+                            'value': force_str(vary_on),
                         })
 
         return sorted(list(vary_list))

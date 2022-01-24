@@ -1643,7 +1643,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             'change': True,
             'save_as': False,
             'has_add_permission': False,
-            'window_close_timeout': 10,
+            'window_close_timeout': 10,  # REPORT: not used anymore
         }
         if cancel_clicked:
             # cancel button was clicked

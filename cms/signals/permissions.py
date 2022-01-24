@@ -1,7 +1,7 @@
 
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
-from menus.menu_pool import menu_pool
+from cms.utils.conf import get_cms_setting
 
 
 def post_save_user(instance, raw, created, **kwargs):
@@ -80,7 +80,8 @@ def pre_delete_pagepermission(instance, **kwargs):
 
 def pre_save_globalpagepermission(instance, raw, **kwargs):
     _clear_users_permissions(instance)
-    menu_pool.clear(all=True)
+    MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+    MenuRenderer.clear_all_caches()
 
 
 def pre_delete_globalpagepermission(instance, **kwargs):

@@ -29,8 +29,6 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
 
-from menus.menu_pool import menu_pool
-
 from treebeard.mp_tree import MP_Node
 
 
@@ -1027,8 +1025,8 @@ class Page(models.Model):
                 placeholder.clear_cache(language, site_id=self.node.site_id)
 
         if menu:
-            # Clears all menu caches for this page's site
-            menu_pool.clear(site_id=self.node.site_id)
+            MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+            MenuRenderer.clear_all_caches(self)
 
     def unpublish(self, language, site=None):
         """

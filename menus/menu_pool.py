@@ -165,13 +165,13 @@ class MenuRenderer:
         """
         key = self.cache_key
 
-        cached_nodes = cache.get(key, None)
-
-        if cached_nodes and self.is_cached:
+        if self.is_cached:
             # Only use the cache if the key is present in the database.
             # This prevents a condition where keys which have been removed
             # from the database due to a change in content, are still used.
-            return cached_nodes
+            cached_nodes = cache.get(key)
+            if cached_nodes:
+                return cached_nodes
 
         final_nodes = []
         toolbar = getattr(self.request, 'toolbar', None)
@@ -200,16 +200,14 @@ class MenuRenderer:
 
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
 
-        if not self.is_cached:
-            # No need to invalidate the internal lookup cache,
-            # just set the value directly.
-            self.__dict__['is_cached'] = True
-            # We need to have a list of the cache keys for languages and sites that
-            # span several processes - so we follow the Django way and share through
-            # the database. It's still cheaper than recomputing every time!
-            # This way we can selectively invalidate per-site and per-language,
-            # since the cache is shared but the keys aren't
-            CacheKey.objects.create(key=key, language=self.request_language, site=self.site.pk)
+        # No need to invalidate the internal lookup cache, just set the value directly.
+        # We need to have a list of the cache keys for languages and sites that
+        # span several processes - so we follow the Django way and share through
+        # the database. It's still cheaper than recomputing every time!
+        # This way we can selectively invalidate per-site and per-language,
+        # since the cache is shared but the keys aren't
+        tmp, self.__dict__['is_cached'] = CacheKey.objects.get_or_create(
+            key=key, language=self.request_language, site=self.site.pk)
         return final_nodes
 
     def _mark_selected(self, nodes):
@@ -245,6 +243,27 @@ class MenuRenderer:
     def get_menu(self, menu_name):
         MenuClass = self.menus[menu_name]
         return MenuClass(renderer=self)
+
+    def clear_cache(self, root_page=None):
+        """
+        This invalidates the cache for a given menu (site_id and language)
+        """
+        cache_keys = CacheKey.objects.get_keys(self.site.id, self.request_language)
+        to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
+        if to_be_deleted:
+            cache.delete_many(to_be_deleted)
+            cache_keys.delete()
+
+    @classmethod
+    def clear_all_caches(cls, root_page=None):
+        """
+        This invalidates all caches for any site_id in any language
+        """
+        cache_keys = CacheKey.objects.get_keys()
+        to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
+        if to_be_deleted:
+            cache.delete_many(to_be_deleted)
+            cache_keys.delete()
 
 
 class MenuPool:

@@ -27,6 +27,7 @@ from cms.constants import (
     PUBLISHER_STATE_DIRTY,
     PUBLISHER_STATE_PENDING,
 )
+from cms.context_processors import cms_settings
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
@@ -117,7 +118,8 @@ class BaseCMSTestCase:
         pass
 
     def _post_teardown(self):
-        menu_pool.clear()
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        MenuRenderer.clear_all_caches()
         cache.clear()
         super()._post_teardown()
         set_current_user(None)
@@ -318,6 +320,11 @@ class BaseCMSTestCase:
 
         _rec(nodes)
 
+    def get_default_menu_renderer(self, request):
+        menu_pool.discover_menus()
+        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
+        return MenuRenderer(pool=menu_pool, request=request)
+
     def assertObjectExist(self, qs, **filter):
         try:
             return qs.get(**filter)
@@ -388,8 +395,8 @@ class BaseCMSTestCase:
     def get_context(self, path=None, page=None):
         if not path:
             path = self.get_pages_root()
-        context = {}
         request = self.get_request(path, page=page)
+        context = cms_settings(request)
         context['request'] = request
         return Context(context)
 

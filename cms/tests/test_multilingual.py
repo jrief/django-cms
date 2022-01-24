@@ -5,6 +5,7 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page, add_plugin
+from cms.context_processors import cms_settings
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
 from cms.models import Title, EmptyTitle
@@ -12,8 +13,6 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_languages
-
-from menus.menu_pool import menu_pool
 
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
@@ -158,8 +157,8 @@ class MultilingualTestCase(CMSTestCase):
         request_1 = self.get_request('/%s/' % TESTLANG, TESTLANG)
         request_2 = self.get_request('/%s/' % TESTLANG2, TESTLANG2)
 
-        request_1_menu_renderer = menu_pool.get_renderer(request_1)
-        request_2_menu_renderer = menu_pool.get_renderer(request_2)
+        request_1_menu_renderer = cms_settings(request_1)['cms_menu_renderer']
+        request_2_menu_renderer = cms_settings(request_2)['cms_menu_renderer']
 
         lang_settings[1][1]['hide_untranslated'] = False
         with self.settings(CMS_LANGUAGES=lang_settings):

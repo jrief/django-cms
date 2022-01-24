@@ -779,6 +779,17 @@ The client IP address is obtained via the :setting:`CMS_REQUEST_IP_RESOLVER`
 in the ``cms.middleware.toolbar.ToolbarMiddleware`` middleware.
 
 
+..  setting:: CMS_MENU_RENDERER
+
+CMS_MENU_RENDERER
+=================
+
+default
+    ``'menus.menu_pool.MenuRenderer'``
+
+Replace default class ``MenuRenderer`` against a customized menu renderer.
+
+
 ..  setting:: CMS_REQUEST_IP_RESOLVER
 
 CMS_REQUEST_IP_RESOLVER

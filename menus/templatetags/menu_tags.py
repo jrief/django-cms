@@ -128,7 +128,7 @@ class ShowMenu(InclusionTag):
                     extra_active, template, namespace, root_id, next_page):
         try:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
+            context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
 
@@ -137,9 +137,6 @@ class ShowMenu(InclusionTag):
         else:
             # new menu... get all the data so we can save a lot of queries
             menu_renderer = context.get('cms_menu_renderer')
-
-            if not menu_renderer:
-                menu_renderer = menu_pool.get_renderer(request)
 
             nodes = menu_renderer.get_nodes(namespace, root_id)
             if root_id:  # find the root id and cut the nodes
@@ -213,14 +210,11 @@ class ShowSubMenu(InclusionTag):
             root_level = None
         try:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
+            context['request']
         except KeyError:
             return {'template': 'menu/empty.html'}
 
         menu_renderer = context.get('cms_menu_renderer')
-
-        if not menu_renderer:
-            menu_renderer = menu_pool.get_renderer(request)
 
         nodes = menu_renderer.get_nodes()
         children = []
@@ -282,7 +276,7 @@ class ShowBreadcrumb(InclusionTag):
     def get_context(self, context, start_level, template, only_visible):
         try:
             # If there's an exception (500), default context_processors may not be called.
-            request = context['request']
+            context['request']
         except KeyError:
             return {'template': 'cms/content.html'}
         if not (isinstance(start_level, int) or start_level.isdigit()):
@@ -297,9 +291,6 @@ class ShowBreadcrumb(InclusionTag):
         ancestors = []
 
         menu_renderer = context.get('cms_menu_renderer')
-
-        if not menu_renderer:
-            menu_renderer = menu_pool.get_renderer(request)
 
         nodes = menu_renderer.get_nodes(breadcrumb=True)
 

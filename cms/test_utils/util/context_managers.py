@@ -8,8 +8,6 @@ from cms.apphook_pool import apphook_pool
 from django.contrib.auth import get_user_model
 from django.utils.translation import get_language, activate
 
-from six.moves import StringIO
-
 
 class NULL:
     pass

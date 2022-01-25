@@ -31,8 +31,6 @@ from cms.utils.i18n import get_current_language
 
 from treebeard.mp_tree import MP_Node
 
-from six import python_2_unicode_compatible
-
 
 logger = getLogger(__name__)
 

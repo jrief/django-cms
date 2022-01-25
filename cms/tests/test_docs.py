@@ -9,8 +9,6 @@ import sys
 from sphinx.application import Sphinx
 from sphinx.errors import SphinxWarning
 
-from six.moves import StringIO
-
 try:
     import enchant
 except ImportError:

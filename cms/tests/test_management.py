@@ -5,8 +5,6 @@ import mock
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.util.context_managers import apphooks
 
-from six.moves import StringIO
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management

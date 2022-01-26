@@ -1,7 +1,6 @@
 import json
 import sys
 import warnings
-
 from urllib.parse import unquote, urljoin
 
 from django.conf import settings
@@ -19,27 +18,21 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate
-from menus.menu_pool import menu_pool
 
 from cms.api import create_page
 from cms.constants import (
-    PUBLISHER_STATE_DEFAULT,
-    PUBLISHER_STATE_DIRTY,
-    PUBLISHER_STATE_PENDING,
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
 )
-from cms.context_processors import cms_settings
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
-    GlobalPagePermission,
-    PagePermission,
-    PageUser,
+    GlobalPagePermission, PagePermission, PageUser,
 )
+from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-
+from menus.menu_pool import menu_pool
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
@@ -118,8 +111,7 @@ class BaseCMSTestCase:
         pass
 
     def _post_teardown(self):
-        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
-        MenuRenderer.clear_all_caches()
+        menu_pool.clear()
         cache.clear()
         super()._post_teardown()
         set_current_user(None)
@@ -320,11 +312,6 @@ class BaseCMSTestCase:
 
         _rec(nodes)
 
-    def get_default_menu_renderer(self, request):
-        menu_pool.discover_menus()
-        MenuRenderer = get_cms_setting('CMS_MENU_RENDERER')
-        return MenuRenderer(pool=menu_pool, request=request)
-
     def assertObjectExist(self, qs, **filter):
         try:
             return qs.get(**filter)
@@ -395,8 +382,8 @@ class BaseCMSTestCase:
     def get_context(self, path=None, page=None):
         if not path:
             path = self.get_pages_root()
+        context = {}
         request = self.get_request(path, page=page)
-        context = cms_settings(request)
         context['request'] = request
         return Context(context)
 
@@ -455,12 +442,21 @@ class BaseCMSTestCase:
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
+        cleanwarningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
 
         if not warningsShown:
             self.fail("No warnings emitted")
-        first = warningsShown[0]
-        for other in warningsShown[1:]:
+
+        for warning in warningsShown:
+            # this specific warning is present due to the way Django
+            # handle asyncio
+            # https://stackoverflow.com/questions/70303895/python-3-10-asyncio-gather-shows-deprecationwarning-there-is-no-current-event
+            if (warning.category != DeprecationWarning and warning.message != 'There is no current event loop'):
+                cleanwarningsShown.append(warning)
+
+        first = cleanwarningsShown[0]
+        for other in cleanwarningsShown[1:]:
             if ((other.message, other.category) != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
 

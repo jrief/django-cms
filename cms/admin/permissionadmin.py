@@ -7,11 +7,10 @@ from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import NoPermissionsException
-from cms.models import PagePermission, GlobalPagePermission
-from cms.utils import permissions, page_permissions
+from cms.models import GlobalPagePermission, PagePermission
+from cms.utils import page_permissions, permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_subordinate_users, get_subordinate_groups
-
 
 PERMISSION_ADMIN_INLINES = []
 

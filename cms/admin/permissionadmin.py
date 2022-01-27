@@ -22,6 +22,8 @@ for model, admin_instance in site._registry.items():
 
 
 class PagePermissionMixin:
+    classes = ['collapse']
+
     def get_autocomplete_fields(self, request, obj=None):
         users_groups_threshold = get_cms_setting('USERS_GROUPS_THRESHOLD')
         if user_model.objects.count() > users_groups_threshold or Group.objects.count() > users_groups_threshold:
@@ -67,9 +69,6 @@ class PagePermissionMixin:
 
 class PagePermissionInlineAdmin(PagePermissionMixin, admin.TabularInline):
     model = PagePermission
-    # use special form, so we can override of user and group field
-    # form = PagePermissionInlineAdminForm
-    classes = ['collapse', 'collapsed']
     fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_publish', 'can_change_advanced_settings',
               'can_change_permissions', 'can_move_page', 'grant_on',
     ]

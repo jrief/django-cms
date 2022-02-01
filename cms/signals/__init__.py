@@ -1,12 +1,12 @@
 
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
-from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
+from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission, post_add_page
 from cms.utils.conf import get_cms_setting
 
 from django.db.models import signals
 from django.dispatch import Signal
 
-from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models import Page, PagePermission, GlobalPagePermission, PageUser, PageUserGroup
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
@@ -103,3 +103,5 @@ if get_cms_setting('PERMISSION'):
                              dispatch_uid='cms_pre_save_globalpagepermission')
     signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
                                dispatch_uid='cms_pre_delete_globalpagepermission')
+
+    signals.post_save.connect(post_add_page, sender=Page, dispatch_uid='cms_post_add_page')

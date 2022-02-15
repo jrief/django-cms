@@ -2,31 +2,67 @@
 Changelog
 =========
 
-Unreleased
-==========
 
-* Fixed builds on RTD
-* Remove debug print from apphook_reload
-* Enforce use of coverage > 4 for python 3.8 support
-* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
-* Improved performance of ``cms list plugins`` command
-* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
-* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
-* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
-* Updated documentation links
-* Added support for Github Actions based CI.
-* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
-* Remove travis integration from the project as the project has moved to Github Actions.
-* Fix all GitHub actions tests run on pull requests
-* Repair broken docs link to users/index.rst
-* Fixed missing builtin arguments on main ``cms`` management command causing it to crash
-* Fixed template label nested translation
-* Few changes in docs/contributing/code.rst
-* Add support for Django 3.2 LTS version
-* removed zh and zh_hans translation (keep zh_CN and zh_TW)
-* Make the width of modal dialog popups configurable through the settings directive
-  ``CMS_MODAL_DIALOG_WIDTH``.
+3.10.0rc1 (unpublished)
+=======================
 
+Highlights:
+-----------
+
+This feature focuses on bringing python 3.10 support, bringing build system to latest nodejs, and bugfixes
+
+Features:
+---------
+* python3.10 support (#7126) (324f08594) -- Vinit Kumar
+* improve build performance (#7192) (bdb04bc31) -- Vinit Kumar
+
+Bug Fixes:
+----------
+* fixing release script to use 'unreleased' (low caps) instead of mixed caps (#7202) (b7a793c88) -- Florian Delizy
+* Cap django requirement at <4 (#7182) (c6c278497) -- Mark Walker
+* Set the default_auto_field on the AppConfigs (#7181) (272d62ced) -- Jeffrey de Lange
+* do not convert & URL query separator to &amp; (#7114) (c0c10e051) -- nichoski
+* discrepancy around python 3.6 compatibility between `setup.py`, docs and tests (#7095) (70970061f) -- Mark Walker
+* update permission cache when moving pages and adding pages. (#7090) (53dddb106) -- Ryo Shimada
+* https://github.com/django-cms/django-cms/projects/6#card-63761457 (#7085) (a5159d3a6) -- Gabriel Andrade
+* missing tests of django3.2 for mysql and sqlite (#7082) (c7fd7c0c5) -- Vinit Kumar
+* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (#7062) (f4043cd75) -- Vinit Kumar
+
+Statistics:
+-----------
+
+This release includes 54 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Anatoliy (3 pull requests)
+* Angelo Dini (1 pull request)
+* Dmytro Litvinov (1 pull request)
+* Florian Delizy (7 pull requests)
+* Gabriel Andrade (1 pull request)
+* Halit Çelik (1 pull request)
+* Jean-Baptiste PENRATH (1 pull request)
+* Jeffrey de Lange (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Kaushal Dhungel (1 pull request)
+* Marco Bonetti (2 pull requests)
+* Mark Walker (9 pull requests)
+* Nebojsa Knezevic (2 pull requests)
+* nichoski (2 pull requests)
+* Nicolai (11 pull requests)
+* Ryo Shimada (1 pull request)
+* Simon Krull (4 pull requests)
+* Stefan van den Eertwegh (1 pull request)
+* Vinit Kumar (4 pull requests)
+
+With the review help of the following contributors:
+
+* Gabriel Andrade
+* Marco Bonetti
+* Nicolai
+* TiredFingers
+* victor-yunenko
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
 
 3.9.0 (2021-06-30)
 ==================
@@ -74,7 +110,7 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title whould be returned instead of the one from the current language
+* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
 * Fixed an issue when running migrations on a multi database project
 * Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 
@@ -175,6 +211,9 @@ Thanks to all contributors for their efforts!
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
 * Updated the content for django CMS’s development community
+* Replaced all occurences of ``force_text`` and ``smart_text`` against
+  ``force_str``and ``smart_str``.
+
 
 
 3.7.4 (2020-07-21)

@@ -1,5 +1,5 @@
 
-from cms.cache.permissions import clear_user_permission_cache
+from cms.cache.permissions import clear_user_permission_cache, clear_permission_cache
 from cms.models import PageUser, PageUserGroup
 from cms.utils.conf import get_cms_setting
 
@@ -88,3 +88,8 @@ def pre_save_globalpagepermission(instance, raw, **kwargs):
 
 def pre_delete_globalpagepermission(instance, **kwargs):
     _clear_users_permissions(instance)
+
+
+def post_add_page(instance, created=False, **kwargs):
+    if created:
+        clear_permission_cache()

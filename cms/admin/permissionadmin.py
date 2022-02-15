@@ -122,6 +122,7 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
               'can_change_permissions', 'can_move_page', 'can_view', 'can_set_as_home', 'sites']
     search_fields = ['user__{}'.format(field) for field in admin_class.search_fields] + ['group__name']
     filter_horizontal = ['sites']
+    autocomplete_fields = ['user', 'group']
 
     def get_list_filter(self, request):
         list_filter = list(super().get_list_filter(request))

@@ -1070,6 +1070,17 @@ This should be an integer preferably taken from the ``cms.constants`` e.g.
 - X_FRAME_OPTIONS_DENY
 
 
+CMS_DEFAULT_IN_NAVIGATION
+=========================
+
+default
+    ``True``
+
+By default, whenever a new page is added, that page by default immediatly shows
+up inside the navigation tree. If this is unwanted behaviour, change this
+configuration directive to ``False``.
+
+
 .. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
 
 CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE

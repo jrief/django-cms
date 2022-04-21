@@ -3,22 +3,9 @@ name: django CMS frontend.yml
 on: [push, pull_request]
 
 concurrency:
-<<<<<<< HEAD
-<<<<<<< HEAD
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
-
-
-=======
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
->>>>>>> dCA/release/3.10.x
-=======
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
->>>>>>> dCA/develop
 jobs:
   frontend:
     runs-on: ubuntu-20.04
@@ -27,13 +14,9 @@ jobs:
         node-version: ['16']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
-<<<<<<< HEAD
       uses: actions/setup-node@v2
-=======
-      uses: actions/setup-node@v3
->>>>>>> dCA/develop
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install

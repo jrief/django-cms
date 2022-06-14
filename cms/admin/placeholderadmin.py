@@ -1109,7 +1109,16 @@ class PlaceholderAdminMixin:
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(
-            request, "admin/cms/page/plugin/delete_confirmation.html", context
+            request,
+            self.delete_confirmation_template
+            or [
+                "admin/{}/{}/delete_confirmation.html".format(
+                    opts.app_label, opts.model_name
+                ),
+                "admin/{}/delete_confirmation.html".format(opts.app_label),
+                "admin/cms/page/plugin/delete_confirmation.html",
+            ],
+            context,
         )
 
     @xframe_options_sameorigin

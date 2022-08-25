@@ -138,7 +138,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
 
     The page slug can then be resolved to a Page model object
     """
-    from cms.utils.page_permissions import user_can_view_page_draft
+    from cms.utils.page_permissions import user_can_view_page_draft, user_can_publish_page
 
     if not bool(use_path) and hasattr(request, '_current_page_cache'):
         # The following is set by CurrentPageMiddleware
@@ -171,14 +171,13 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     # In this case the selected page is not reachable
     if page and not draft:
         now = timezone.now()
-        unpublished_ancestors = (
-            page
-            .get_ancestor_pages()
-            .filter(
-                Q(publication_date__gt=now) | Q(publication_end_date__lt=now),
-            )
-        )
-        if unpublished_ancestors.exists():
+        if not user_can_publish_page(request.user, page) and (
+            page.publication_date and page.publication_date > now
+            or page.publication_end_date and page.publication_end_date < now
+            or page.get_ancestor_pages().filter(
+                Q(publication_date__gt=now) | Q(publication_end_date__lt=now)
+            ).exists()
+        ):
             page = None
     return page
 

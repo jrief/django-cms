@@ -171,13 +171,14 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     # In this case the selected page is not reachable
     if page and not draft:
         now = timezone.now()
-        if (
-            page.publication_date and page.publication_date > now
-            or page.publication_end_date and page.publication_end_date < now
-            or page.get_ancestor_pages().filter(
-                Q(publication_date__gt=now) | Q(publication_end_date__lt=now)
-            ).exists()
-        ):
+        unpublished_ancestors = (
+            page
+            .get_ancestor_pages()
+            .filter(
+                Q(publication_date__gt=now) | Q(publication_end_date__lt=now),
+            )
+        )
+        if unpublished_ancestors.exists():
             page = None
     return page
 

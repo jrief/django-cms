@@ -1231,6 +1231,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         try:
             page.unpublish(language)
+            menu_renderer = cms_settings(request)['cms_menu_renderer']
+            menu_renderer.clear_cache(page)
+
             message = _('The %(language)s page "%(page)s" was successfully unpublished') % {
                 'language': language_name, 'page': page}
             messages.info(request, message)

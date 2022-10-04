@@ -806,6 +806,7 @@ var Toolbar = new Class({
      */
 
     set_color_scheme: function (scheme) {
+        return;  // TODO: temporary fix to prevent loosing pagetree
         CMS.API.Helpers.setSettings({ color_scheme: scheme });
         if (scheme === 'auto') {
             this.ui.body.removeAttr('data-color-scheme');

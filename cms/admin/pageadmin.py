@@ -277,6 +277,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             # we have to set the initial value manually
             request.GET = request.GET.copy()
             request.GET['source'] = page.pk
+        elif request.method == 'POST':
+            # use the parent node from the source page to duplicate page as sibling
+            request.POST = request.POST.copy()
+            if page.parent_page:
+                request.POST['parent_node'] = page.parent_page.node_id
         return self.add_view(request)
 
     def advanced(self, request, object_id):

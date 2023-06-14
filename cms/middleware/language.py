@@ -1,6 +1,10 @@
 import datetime
 
-from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
+try:
+    from django.utils.translation import LANGUAGE_SESSION_KEY
+except ImportError:
+    LANGUAGE_SESSION_KEY = '_language'
+from django.utils.translation import get_language
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 

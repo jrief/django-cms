@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import re
 from collections import namedtuple
@@ -36,6 +38,8 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
+from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
@@ -55,7 +59,6 @@ from cms.cache.permissions import clear_permission_cache
 from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
-    EmptyPageContent,
     GlobalPagePermission,
     Page,
     PageContent,
@@ -106,6 +109,10 @@ class PageAdmin(admin.ModelAdmin):
     copy_form = CopyPageForm
     move_form = MovePageForm
     inlines = PERMISSION_ADMIN_INLINES
+    search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
+
+    def has_module_permission(self, request):
+        return False  # Hides page model from the admin index
 
     def has_add_permission(self, request):
         return False
@@ -171,6 +178,7 @@ class PageAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
@@ -350,10 +358,45 @@ class PageAdmin(admin.ModelAdmin):
         return super().response_delete(request, obj_display, obj_id)
 
     def get_deleted_objects(self, objs, request):
-        deleted_objs = list(objs)
-        for obj in objs:
-            deleted_objs.extend(obj.get_descendant_pages())
-        return super().get_deleted_objects(deleted_objs, request)
+        """Minimize complexity of delete selected confirmation: Only show pages, page contents and plugins numbers,
+        only show Page and PageContent objects in the details.
+        """
+        def recursively_remove(deleted_objects: list | str) -> list:
+            """Remove all objects that are not Page or PageContent from the nested list of deleted objects.
+            Reformat the messages."""
+            if isinstance(deleted_objects, str):
+                return deleted_objects
+            result = []
+            for obj in deleted_objects:
+                item = recursively_remove(obj)
+                if isinstance(item, str):
+                    if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
+                        text = re.findall(r'>(.*)<', obj)
+                        if text:
+                            result.append(mark_safe("<b>" + text[0] + "</b>"))
+                        else:
+                            result.append(mark_safe(
+                                "<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>"
+                            ))
+                    elif obj.startswith(f"{capfirst(PageContent._meta.verbose_name)}: "):
+                        result.insert(0, mark_safe(
+                            item.removeprefix(f"{capfirst(PageContent._meta.verbose_name)}: ")
+                        ))
+                elif item:
+                    result.append(item)
+            return result
+
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+        to_delete = recursively_remove(to_delete)
+        model_count = {
+            key: value for key, value in model_count.items() if key in (
+                Page._meta.verbose_name_plural,
+                PageContent._meta.verbose_name_plural,
+                CMSPlugin._meta.verbose_name_plural
+            )
+        }
+
+        return to_delete, model_count, perms_needed, protected
 
     def delete_model(self, request, obj):
         operation_token = send_pre_page_operation(
@@ -785,6 +828,7 @@ class PageContentAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
@@ -1038,6 +1082,14 @@ class PageContentAdmin(admin.ModelAdmin):
         )
         return has_perm
 
+    def get_sites_for_user(self, user):
+        sites = Site.objects.order_by('name')
+
+        if not get_cms_setting('PERMISSION') or user.is_superuser:
+            return sites
+        _has_perm = page_permissions.user_can_change_at_least_one_page
+        return [site for site in sites if _has_perm(user, site)]
+
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG
 
@@ -1110,6 +1162,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'admin': self,
             'tree': {
                 'site': site,
+                'sites': self.get_sites_for_user(request.user),
                 'query': query,
                 'is_filtered': changelist_form.is_filtered(),
                 'items': pages,
@@ -1141,7 +1194,6 @@ class PageContentAdmin(admin.ModelAdmin):
         else:
             if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting('PLACEHOLDERS')):
                 return HttpResponseBadRequest(_("Placeholder selection not valid"))
-
 
         page_content.template = to_template
         page_content.save()
@@ -1238,13 +1290,15 @@ class PageContentAdmin(admin.ModelAdmin):
                 'language': force_str(get_language_object(language)['name'])
             }
             messages.success(request, message)
+            if language in page.admin_content_cache:
+                del page.admin_content_cache[language]
+            if language in page.page_content_cache:
+                del page.page_content_cache[language]
 
             page_url.delete()
             page_content.delete()
             for p in saved_plugins:
                 p.delete()
-
-            page.remove_language(language)
 
             send_post_page_operation(
                 request=request,

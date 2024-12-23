@@ -14,7 +14,7 @@ def remove_pageurl_duplicates(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("cms", "0038_alter_page_site"),
+        ("cms", "0039_merge_0037_wip_uniweb_0038_alter_page_site"),
     ]
 
     operations = [

@@ -36,7 +36,7 @@ class Placeholder(models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     source = GenericForeignKey('content_type', 'object_id')
-    cache_placeholder = True  #: Flag caching the palceholder's content
+    cache_placeholder = True  #: Flag caching the placeholder's content
     is_static = False  #: Set to "True" for static placeholders (by the template tag)
     is_editable = True  #: If False the content of the placeholder is not editable in the frontend
 

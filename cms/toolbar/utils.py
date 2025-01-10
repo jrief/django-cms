@@ -246,8 +246,9 @@ def get_object_for_language(obj: models.Model, language: str, latest: bool = Fal
     # or get_content_obj does not accept language parameter
     # Now query db
     grouper_filter = {field: getattr(obj, field)}
-    qs = model.admin_manager.latest_content() if latest and hasattr(model, "admin_manager") else model.objects
-    obj._sibling_objects_for_language_cache = {
-        result.language: result for result in qs.filter(**grouper_filter)
-    }
+    if latest and hasattr(model, "admin_manager"):
+        qs = model.admin_manager.filter(**grouper_filter).latest_content()
+    else:
+        qs = model.objects.filter(**grouper_filter)
+    obj._sibling_objects_for_language_cache = {result.language: result for result in qs}
     return obj._sibling_objects_for_language_cache.get(language)

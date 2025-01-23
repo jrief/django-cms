@@ -1434,6 +1434,16 @@ msgstr "Ausschneiden"
 msgid "Paste"
 msgstr "Einfügen"
 
+#: templates/admin/cms/page/tree/actions_dropdown.html:42
+#: templates/admin/cms/page/tree/actions_dropdown.html:47
+msgid "Delete all translations"
+msgstr "Alle Übersetzungen löschen"
+
+#: templates/admin/cms/page/tree/actions_dropdown.html:52
+#: templates/admin/cms/page/tree/actions_dropdown.html:57
+msgid "Delete this translation"
+msgstr "Diese Übersetzung löschen"
+
 #: templates/admin/cms/page/tree/actions_dropdown.html:52
 #: templates/admin/cms/page/tree/actions_dropdown.html:54
 #: templates/admin/cms/page/tree/actions_dropdown.html:61

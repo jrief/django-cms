@@ -192,11 +192,6 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return page_permissions.user_can_change_page_advanced_settings(request.user, page=obj, site=site)
 
     def log_deletion(self, request, object, object_repr):
-        # DJANGO_42
-        # Block the admin log for deletion. A signal takes care of this!
-        return
-
-    def log_deletions(self, request, queryset):
         # Block the admin log for deletion. A signal takes care of this!
         return
 
@@ -815,11 +810,6 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return
 
     def log_deletion(self, request, object, object_repr):
-        # DJANGO_42
-        # Block the admin log for deletion. A signal takes care of this!
-        return
-
-    def log_deletions(self, request, queryset):
         # Block the admin log for deletion. A signal takes care of this!
         return
 

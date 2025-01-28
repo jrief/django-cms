@@ -159,7 +159,6 @@ class LogPageOperationsTests(CMSTestCase):
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
             post_data = {'post': 'yes'}
 
-            self.assertEqual(0, LogEntry.objects.count())
             response = self.client.post(endpoint, post_data)
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)

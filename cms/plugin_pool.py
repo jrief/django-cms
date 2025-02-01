@@ -147,7 +147,7 @@ class PluginPool:
 
         self.discover_plugins()
         plugins = self.plugins.values()
-        template = lazy(page.get_template, str)() if page else None  # Make template lazy to avoid unnecessary db access
+        template = page.get_template() if page else None
 
         allowed_plugins = get_placeholder_conf(
             setting_key,

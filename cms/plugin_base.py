@@ -372,7 +372,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return None
 
     @classmethod
-    @template_slot_caching
     def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
@@ -648,7 +647,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
-    @template_slot_caching
     def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that are allowed
@@ -678,7 +676,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.registered_plugins
 
     @classmethod
-    @template_slot_caching
     def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that can be added
@@ -714,7 +711,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
-    @template_slot_caching
     def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         from cms.utils.placeholder import get_placeholder_conf
 

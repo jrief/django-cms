@@ -11,6 +11,7 @@ from cms.plugin_rendering import (
     StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.toolbar.toolbar import CMSToolbar
 
 
 class TestStructureRenderer(CMSTestCase):
@@ -193,6 +194,50 @@ class TestContentRenderer(TestStructureRenderer):
             self.assertIn("pluginapp/link/bugs.html", logs.output[0])
             self.assertIn("ZeroDivisionError:", logs.output[1])
         LinkPlugin.render_template = link_template
+
+    def test_exception_in_plugin_render_shows_error_in_edit_mode(self):
+        plugin_context = Context()
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=True)
+        self.assertTrue(self.renderer.toolbar.edit_mode_active)
+        self.assertIn('<div class="cms-rendering-exception">', markup)
+        self.assertIn("ZeroDivisionError: division by zero", markup)
+
+    def test_exception_in_plugin_render_is_silent_in_preview_mode(self):
+        plugin_context = Context()
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
+        self.assertEqual('', markup)
+
+    def test_exception_in_plugin_render_is_silent_in_live_mode(self):
+        plugin_context = Context()
+        self.request = self.get_request(
+            self.cms_page.get_absolute_url('en'),
+            'en',
+            page=self.cms_page,
+        )
+        self.request.toolbar = CMSToolbar(self.request)
+        self.renderer = self.renderer_class(self.request)
+
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
+        self.assertFalse(self.renderer.toolbar.edit_mode_active)
+        self.assertEqual('', markup)
+
+    @override_settings(CMS_CATCH_PLUGIN_500_EXCEPTION=False)
+    def test_exception_in_plugin_render_is_raised__in_live_mode(self):
+        plugin_context = Context()
+        self.request = self.get_request(
+            self.cms_page.get_absolute_url('en'),
+            'en',
+            page=self.cms_page,
+        )
+        self.request.toolbar = CMSToolbar(self.request)
+        self.renderer = self.renderer_class(self.request)
+
+        with self.assertRaises(ZeroDivisionError):
+            with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+                self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
 
 
 class TestLegacyRenderer(TestContentRenderer):

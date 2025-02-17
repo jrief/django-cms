@@ -84,6 +84,7 @@ _placeholder_operations_map = {
 create_log_entry = LogEntry.objects.log_action
 
 
+
 def _is_valid_page_instance(page):
     """
     Check if the supplied object is a valid Page / PageType object

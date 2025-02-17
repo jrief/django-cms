@@ -61,7 +61,7 @@ class CMSSitemap(Sitemap):
                     .values_list("changed_date")[:1]
                 )
             )
-            .filter(content_changed_date__isnull=False)
+            .filter(content_changed_date__isnull=False)  # Remove page content with redirects
         )
 
     def lastmod(self, page_url):

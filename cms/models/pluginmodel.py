@@ -264,6 +264,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return self._inst
 
     def get_plugin_info(self, children=None, parents=None):
+        plugin_class = self.get_plugin_class()
         return {
             'type': 'plugin',
             'position': self.position,
@@ -275,6 +276,8 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'plugin_parent': str(self.parent_id or ''),
             'plugin_restriction': children or [],
             'plugin_parent_restriction': parents or [],
+            'disable_edit': plugin_class.disable_edit,
+            'disable_child_plugins': plugin_class.disable_child_plugins,
             'urls': self.get_action_urls(),
         }
 

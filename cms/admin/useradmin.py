@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from django.contrib import admin
-from django.contrib.admin import site
+from django.contrib.admin import ModelAdmin, site
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext
@@ -15,7 +15,7 @@ from cms.utils.permissions import get_model_permission_codename, get_user_permis
 
 
 user_model = get_user_model()
-admin_class = UserAdmin
+admin_class: type[ModelAdmin] = UserAdmin
 for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__

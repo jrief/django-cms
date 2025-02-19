@@ -3,6 +3,7 @@ import logging
 import sys
 from collections import OrderedDict
 from functools import partial
+from typing import Any, Optional, Union
 
 from classytags.utils import flatten_context
 from django.contrib.sites.models import Site
@@ -159,7 +160,9 @@ class BaseRenderer:
             self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
         return self._cached_plugin_classes[plugin_type]
 
-    def get_plugins_to_render(self, placeholder, language, template):
+    def get_plugins_to_render(
+        self, placeholder: Placeholder, language: str, template: Optional[str]
+    ):
         from cms.utils.plugins import get_plugins
 
         plugins = get_plugins(
@@ -170,11 +173,11 @@ class BaseRenderer:
         )
         return plugins
 
-    def get_rendered_plugins_cache(self, placeholder):
-        blank = {
-            'plugins': [],
-            'plugin_parents': {},
-            'plugin_children': {},
+    def get_rendered_plugins_cache(self, placeholder: Placeholder):
+        blank: dict[str, Any] = {
+            "plugins": [],
+            "plugin_parents": {},
+            "plugin_children": {},
         }
         return self._rendered_plugins_by_placeholder.get(placeholder.pk, blank)
 
@@ -194,7 +197,7 @@ class ContentRenderer(BaseRenderer):
 
     plugin_edit_template = (
         '<template class="cms-plugin '
-        'cms-plugin-start cms-plugin-{pk}"></template>{content}'
+        'cms-plugin-start cms-plugin-{pk}" data-cms-placeholder="{placeholder}" data-cms-position="{position}"></template>{content}'
         '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
     )
     placeholder_edit_template = (
@@ -214,8 +217,17 @@ class ContentRenderer(BaseRenderer):
             return False
         return not self._placeholders_are_editable
 
-    def render_placeholder(self, placeholder, context, language=None, page=None,
-                           editable=False, use_cache=False, nodelist=None, width=None):
+    def render_placeholder(
+        self,
+        placeholder: Placeholder,
+        context: Context,
+        language: Optional[str] = None,
+        page: Optional[Page] = None,
+        editable: bool = False,
+        use_cache: bool = False,
+        nodelist: Optional[Any] = None,
+        width: Optional[int] = None,
+    ):
         from sekizai.helpers import Watcher
 
         language = language or self.request_language
@@ -455,8 +467,15 @@ class ContentRenderer(BaseRenderer):
             self._rendered_static_placeholders[static_placeholder.pk] = static_placeholder
         return content
 
-    def render_plugin(self, instance, context, placeholder=None, editable=False):
-        if not placeholder:
+    def render_plugin(
+        self,
+        instance: CMSPlugin,
+        context: Context,
+        placeholder: Optional[Placeholder] = None,
+        editable: bool = False,
+    ):
+        context["_last_plugin"] = instance  # Used if an exception is rendered
+        if placeholder is None:
             placeholder = instance.placeholder
 
         instance, plugin = instance.get_plugin_instance()
@@ -501,24 +520,39 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            content = self.plugin_edit_template.format(pk=instance.pk, content=content)
-            placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
-            placeholder_cache.setdefault('plugins', []).append(instance)
+            content = self.plugin_edit_template.format(
+                pk=instance.pk,
+                placeholder=instance.placeholder_id,
+                content=content,
+                position=instance.position
+            )
+            placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
+                placeholder.pk, {}
+            )
+            placeholder_cache.setdefault("plugins", []).append(instance)
         return mark_safe(content)
 
     def render_exception(self, action, instance, context, placeholder, editable):
         if editable:
-            exc, value, traceback = context['exc_info']
-            return f'''
-                <div style="display: inline-block; border: none; background: rgba(0, 0, 0, 0.5);
-                   padding: 0.6em 0.3em; cursor: not-allowed; min-height: 2em; width:100%; vertical-align:middle;
-                   text-align:center;">
-                    <span style="font-weight: bold; color: darkred;">
-                      Exception when {action} in {instance.plugin_type} (id={instance.id})<br />
-                      {exc.__name__}: {value}
-                    </span>
-                </div>'''
-        return ''
+            if settings.DEBUG:
+                reporter = ExceptionReporter(context["request"], exc, value, traceback)
+                html = reporter.get_traceback_html()
+            else:
+                html = ""
+            heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
+            if "_last_plugin" in context:
+                # Make error message editable by double-click to open the editor for the plugin causing the exception
+                instance = context["_last_plugin"]
+                heading = self.plugin_edit_template.format(
+                    pk=instance.pk,
+                    placeholder=instance.placeholder_id,
+                    content=heading,
+                    position=instance.position,
+                )
+                placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
+                    placeholder.pk, {}
+                )
+                placeholder_cache.setdefault("plugins", []).append(instance)
 
     def render_plugins(self, placeholder, language, context, editable=False, template=None):
         plugins = self.get_plugins_to_render(

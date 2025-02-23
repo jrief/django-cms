@@ -217,6 +217,7 @@ class Placeholder(models.Model):
         if not hasattr(self, '_page'):
             from cms.models.contentmodels import PageContent
             try:
+                # Directly go through PageContent to avoid having to get the source and the page in separate queries
                 self._page = PageContent.admin_manager.filter(placeholders=self).select_related("page").first().page
             except AttributeError:
                 self._page = None

@@ -6,7 +6,7 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
 from django.urls import include, re_path
 from django.utils.encoding import force_str
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, lazy
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
@@ -22,14 +22,19 @@ class PluginPool:
     def __init__(self):
         self.plugins = {}
         self.discovered = False
+        self.global_restrictions_cache = {
+            None: {},
+            **{key: {} for key in get_cms_setting('PLACEHOLDER_CONF').keys()},
+        }
+        self.global_template_restrictions = any(
+            ".htm" in (key or "") for key in self.global_restrictions_cache
+        )
 
     def _clear_cached(self):
         if 'registered_plugins' in self.__dict__:
             del self.__dict__['registered_plugins']
-
         if 'plugins_with_extra_menu' in self.__dict__:
             del self.__dict__['plugins_with_extra_menu']
-
         if 'plugins_with_extra_placeholder_menu' in self.__dict__:
             del self.__dict__['plugins_with_extra_placeholder_menu']
 
@@ -142,7 +147,7 @@ class PluginPool:
 
         self.discover_plugins()
         plugins = self.plugins.values()
-        template = page.get_template() if page else None
+        template = lazy(page.get_template, str)() if page else None  # Make template lazy to avoid unnecessary db access
 
         allowed_plugins = get_placeholder_conf(
             setting_key,

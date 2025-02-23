@@ -333,29 +333,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     def reload(self):
         return CMSPlugin.objects.select_related("parent", "placeholder").get(pk=self.pk)
 
-    def _get_ancestors_ids(self):
-        if plugin_supports_cte():
-            cursor = _get_database_cursor('write')
-            sql = f'{_get_ancestors_cte()} SELECT id FROM ancestors;'
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk])
-            ancestors = [item[0] for item in cursor.fetchall()]
-        else:
-            ancestors = [self.id]
-            parent = self.parent
-            while parent:
-                ancestors.append(parent.id)
-                parent = parent.parent
-        return ancestors
-
-    def get_ancestors(self):
-        """
-        Returns the ancestors of the current plugin starting with the current plugin until the root plugin.
-        """
-        ancestors_ids = self._get_ancestors_ids()
-        order_by = Case(*(When(id=id, then=pos) for pos, id in enumerate(ancestors_ids)))
-        return CMSPlugin.objects.filter(pk__in=ancestors_ids).order_by(order_by)
-
     def _get_descendants_count(self):
         cursor = _get_database_cursor('write')
         sql = _get_descendants_cte() + '\n'

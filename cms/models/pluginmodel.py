@@ -328,7 +328,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return
 
     def reload(self):
-        return CMSPlugin.objects.get(pk=self.pk)
+        return CMSPlugin.objects.select_related("parent", "placeholder").get(pk=self.pk)
 
     def _get_ancestors_ids(self):
         if plugin_supports_cte():

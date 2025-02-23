@@ -725,7 +725,7 @@ CMS_DEFAULT_IN_NAVIGATION
 default
     ``True``
 
-Decides if a newly added page content is automatically added to the navigation. 
+Decides if a newly added page content is automatically added to the navigation.
 
 
 **************
@@ -1140,7 +1140,7 @@ default
 
 This is the name of the plugin created in the Page Wizard when the "Content"
 field is filled in. There should be no need to change it, unless you
-**don't** use ``djangocms-text-ckeditor`` in your project.
+**don't** use `djangocms-text`` or ```djangocms-text-ckeditor`` in your project.
 
 ..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
@@ -1152,9 +1152,10 @@ default
 
 This is the name of the body field in the plugin created in the Page Wizard
 when the "Content" field is filled in. There should be no need to change it,
-unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
-your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
-body field **different** than ``body``.
+unless you **don't** use `djangocms-text`` or ``djangocms-text-ckeditor`` in
+your project **and** your custom plugin defined in
+:setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a body field **different** than
+``body``.
 
 .. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
 
@@ -1172,7 +1173,7 @@ default
 .. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
 
 CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
-===============================================
+=======================================
 
 default
     ``live-url``
@@ -1204,6 +1205,36 @@ default
 
 This indicates to the CMS that it should redirect requests with an non-lowercase
 slug to its lowercase version if no page with that slug is found.
+
+
+CMS_CATCH_PLUGIN_500_EXCEPTION
+==============================
+
+default
+    ``True``
+
+Should rendering plugins cause an exception, they are caught by default.
+In edit mode the exception is shown in the placeholder, in preview mode and
+on public content the placeholder remains empty.
+
+If ``CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, viewing public
+content will cause a server error (http error code 500). This can, for example,
+be used for regular health checking.
+
+CMS_ALWAYS_REFRESH_CONTENT
+==========================
+
+default
+    ``False``
+
+.. versionadded:: 4.2
+
+If set to ``True``, the CMS will always refresh the content of the page after
+edit action, just as in django CMS 4.1 and before.
+
+Only use this setting of your custom plugins have issues with the new partial
+content refresh when editing. **If you need to set this, make sure to report an
+issue on GitHub.**
 
 
 CMS_CONFIRM_VERSION4

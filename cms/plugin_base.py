@@ -230,6 +230,25 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
 
+    #: Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
+    #: their parent plugins.
+    #:
+    #: If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
+    #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
+    #:
+    #: Moving or adding child plugins are not affected.
+    disable_edit = False
+
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have no
+    #: fields to fill, or which have valid default values for *all* fields.
+    #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
+    #: errors
+    show_add_form = True
+
+    #: The plugin does not modify the context or request and its rendering is not influenced by its parent
+    #: plugins. Defaults to ``False`` unless ``CMS_ALWAYS_REFRESH_CONTENT`` is set to ``True``.
+    is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
+
     # Warning: setting these to False, may have a serious performance impact,
     # because their child-parent-relation must be recomputed each
     # time the plugin tree is rendered.

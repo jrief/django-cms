@@ -7,6 +7,7 @@ from functools import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
 from django.db.models.base import ModelBase
+from django.db.models.expressions import Case, When
 from django.urls import NoReverseMatch
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -17,6 +18,32 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+
+
+@cache
+def _get_ancestors_cte():
+    db_vendor = _get_database_vendor('read')
+    if db_vendor == 'oracle':
+        sql = (
+            "WITH ancestors AS ("
+            "SELECT {0}.id, {0}.parent_id "
+            "FROM {0} WHERE id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.parent_id FROM {0} "
+            "INNER JOIN ancestors ON {0}.id=ancestors.parent_id"
+            ")"
+        )
+    else:
+        sql = (
+            "WITH RECURSIVE ancestors AS ("
+            "SELECT {0}.id, {0}.parent_id "
+            "FROM {0} WHERE id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.parent_id FROM {0} "
+            "INNER JOIN ancestors ON {0}.id=ancestors.parent_id"
+            ")"
+        )
+    return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
 
 
 @cache
@@ -318,6 +345,29 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
+
+    def _get_ancestors_ids(self):
+        if plugin_supports_cte():
+            cursor = _get_database_cursor('write')
+            sql = f'{_get_ancestors_cte()} SELECT id FROM ancestors;'
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql, [self.pk])
+            ancestors = [item[0] for item in cursor.fetchall()]
+        else:
+            ancestors = [self.id]
+            parent = self.parent
+            while parent:
+                ancestors.append(parent.id)
+                parent = parent.parent
+        return ancestors
+
+    def get_ancestors(self):
+        """
+        Returns the ancestors of the current plugin starting with the current plugin until the root plugin.
+        """
+        ancestors_ids = self._get_ancestors_ids()
+        order_by = Case(*(When(id=id, then=pos) for pos, id in enumerate(ancestors_ids)))
+        return CMSPlugin.objects.filter(pk__in=ancestors_ids).order_by(order_by)
 
     def _get_descendants_count(self):
         if plugin_supports_cte():

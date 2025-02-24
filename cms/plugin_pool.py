@@ -226,5 +226,63 @@ class PluginPool:
                           if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Optional[Page] = None):
+        """
+        Retrieve the restrictions cache for a given plugin instance.
+
+        This method checks if the plugin class can be cached globally. This is the case if the
+        plugin restrictions only depend on template and placeholder slot as described by the
+        CMS_PLACEHOLDER_CONF setting.
+
+        If it can, it retrieves the appropriate restrictions cache based on the template and slot
+        of the plugin instance's placeholder. If not, it returns the (local) request cache which will
+        be recalculated for each request.
+
+        Args:
+            request_cache (dict): The current request cache.
+            instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
+            page (Optional[Page]): The page associated with the plugin instance, if any.
+
+        Returns:
+            dict: The restrictions cache for the given plugin instance - or the cache valid for the request.
+        """
+        plugin_class = self.get_plugin(instance.plugin_type)
+        if not self.can_cache_globally(plugin_class):
+            return request_cache
+        slot = instance.placeholder.slot
+        if self.global_template_restrictions:
+            template = plugin_class._get_template_for_conf(page)
+        else:
+            template = ""
+
+        if f"{template} {slot}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{template} {slot}"]
+        if template and template in self.global_restrictions_cache:
+            return self.global_restrictions_cache[template]
+        if slot in self.global_restrictions_cache:
+            return self.global_restrictions_cache[slot]
+        return self.global_restrictions_cache[None]
+
+    restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
+
+    def can_cache_globally(self, plugin_class: CMSPluginBase) -> bool:
+        """
+        Check if the restrictions for a given plugin class can be cached globally.
+
+        This is the case if the plugin restrictions only depend on template and placeholder slot as
+        described by the CMS_PLACEHOLDER_CONF setting.
+
+        Args:
+            plugin_class (CMSPluginBase): The plugin class for which to check if restrictions can be cached globally.
+
+        Returns:
+            bool: True if the restrictions can be cached globally, False otherwise.
+        """
+        if not hasattr(plugin_class, '_cache_restrictions_globally'):
+            plugin_class._cache_restrictions_globally = all(
+                hasattr(getattr(plugin_class, method_name), "_template_slot_caching") for method_name in self.restriction_methods
+            )
+        return plugin_class._cache_restrictions_globally
+
 
 plugin_pool = PluginPool()

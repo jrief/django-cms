@@ -30,4 +30,5 @@ class UserSettings(models.Model):
         return force_str(self.user)
 
     def has_placeholder_change_permission(self, user):
+        # User always has permission to change their own clipboard
         return True

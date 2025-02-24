@@ -1,10 +1,11 @@
 import json
 from collections import defaultdict, deque
-from typing import Optional
+from typing import Any, Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.http import HttpRequest
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
@@ -12,8 +13,11 @@ from django.utils.translation import (
     gettext,
     override as force_language,
 )
+from sekizai.context import SekizaiContext
+from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.models import CMSPlugin, PageContent, Placeholder
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse

@@ -1,4 +1,5 @@
 from operator import attrgetter
+from typing import Optional
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
@@ -10,6 +11,7 @@ from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name

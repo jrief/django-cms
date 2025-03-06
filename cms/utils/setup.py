@@ -16,7 +16,7 @@ def validate_dependencies():
     """
     Check for installed apps, their versions and configuration options
     """
-    if not app_is_installed('treebeard'):
+    if not app_is_installed("treebeard"):
         raise ImproperlyConfigured(
             'django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.'
         )
@@ -50,6 +50,7 @@ def setup():
     Gather all checks and validations
     """
     from cms.plugin_pool import plugin_pool
+
     validate_dependencies()
     validate_settings()
     plugin_pool.validate_templates()

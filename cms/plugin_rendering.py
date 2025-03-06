@@ -143,7 +143,6 @@ class BaseRenderer:
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(plugin.placeholder_id, {})
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            page=page,
             restrictions_cache=placeholder_cache,
         )
         content = get_plugin_toolbar_js(
@@ -200,7 +199,7 @@ class ContentRenderer(BaseRenderer):
     )
     placeholder_edit_template = (
         '{content} '
-        '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div> '
+        '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>'
         '<script data-cms>{plugin_js}\n{placeholder_js}</script>'
     )
 
@@ -327,10 +326,14 @@ class ContentRenderer(BaseRenderer):
         }
         return context
 
-    def render_obj_placeholder(self, slot, context, inherit,
-                               nodelist=None, editable=True):
-        from cms.models import Placeholder
-
+    def render_obj_placeholder(
+        self,
+        slot: str,
+        context: Context,
+        inherit: bool,
+        nodelist=None,
+        editable: bool = True,
+    ):
         # Check if page, if so delegate to render_page_placeholder
         if self.current_page:
             return self.render_page_placeholder(
@@ -346,8 +349,7 @@ class ContentRenderer(BaseRenderer):
         current_obj = self.toolbar.get_object()
         if current_obj is None:
             raise PlaceholderNotFound(f"No object found for placeholder '{slot}'")
-        rescan_placeholders_for_obj(current_obj)
-        placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
+        placeholder = rescan_placeholders_for_obj(current_obj).get(slot)
         content = self.render_placeholder(
             placeholder,
             context=context,
@@ -652,7 +654,7 @@ class StructureRenderer(BaseRenderer):
         <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
             {plugin_menu_js}
         </script>
-        <script data-cms>{plugin_js}\n{placeholder_js}</script>
+        {plugin_js}{placeholder_js}
         """
     )
 
@@ -684,13 +686,13 @@ class StructureRenderer(BaseRenderer):
         if placeholder.pk not in self._rendered_placeholders:
             self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
-        placeholder_structure_is = self.placeholder_edit_template.format(
+        placeholder_structure_js = self.placeholder_edit_template.format(
             placeholder_id=placeholder.pk,
             plugin_js=plugin_js_output,
             plugin_menu_js=self.get_placeholder_plugin_menu(placeholder, page=page),
             placeholder_js=placeholder_toolbar_js,
         )
-        return mark_safe(placeholder_structure_is)
+        return mark_safe(placeholder_structure_js)
 
     def render_page_placeholder(self, page, placeholder, language=None):
         return self.render_placeholder(placeholder, language=language, page=page)
@@ -738,7 +740,7 @@ class LegacyRenderer(ContentRenderer):
         <script data-cms id="cms-plugin-child-classes-{placeholder_id}" type="text/cms-template">
             {plugin_menu_js}
         </script>
-        <script data-cms>{plugin_js}\n{placeholder_js}</script>
+        {plugin_js}{placeholder_js}
         """
     )
 

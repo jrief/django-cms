@@ -6,6 +6,10 @@ This middleware is required only when CMS_PERMISSION = True.
 from django.utils.deprecation import MiddlewareMixin
 
 
+class CurrentUserMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
 class CurrentUserMiddleware(MiddlewareMixin):
     def process_request(self, request):
         from cms.utils.permissions import set_current_user

@@ -265,6 +265,9 @@ class MenuRenderer:
         MenuClass = self.menus[menu_name]
         return MenuClass(renderer=self)
 
+    def clear_cache(self, page):
+        cache.delete(self.cache_key)
+
 
 class MenuPool:
 

@@ -200,7 +200,7 @@ class ContentRenderer(BaseRenderer):
     placeholder_edit_template = (
         '{content} '
         '<div class="cms-placeholder cms-placeholder-{placeholder_id}"></div>'
-        '<script data-cms>{plugin_js}\n{placeholder_js}</script>'
+        '{plugin_js}{placeholder_js}'
     )
 
     def __init__(self, request):

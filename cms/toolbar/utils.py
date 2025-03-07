@@ -161,7 +161,7 @@ def get_plugin_tree(
         ) if target_plugin.parent_id else None
         try:
             content["content"] = get_plugin_content(request, downcasted, {"parent": parent})
-        except Exception:
+        except Exception as exc:
             pass  # do not deliver content if rendering fails
 
     return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}

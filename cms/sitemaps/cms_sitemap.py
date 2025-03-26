@@ -65,7 +65,13 @@ class CMSSitemap(Sitemap):
         )
 
     def lastmod(self, page_url):
-        return page_url.content_changed_date
+        try:
+            return page_url.content_changed_date
+        except AttributeError:
+            try:
+                return PageContent.objects.get(page=page_url.page, language=page_url.language).changed_date
+            except PageContent.DoesNotExist:
+                return
 
     def location(self, page_url):
         return page_url.get_absolute_url(page_url.language)
